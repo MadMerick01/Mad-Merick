@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+- **Desert rocks can now be switched off.** The **Road** tab has a **Desert rocks** On / Off switch. Off clears BeamNG.Earth's scattered rocks, so the open desert becomes a fast, clear surface for chases, a bit like a salt-lake speed run. Rocks are on by default, Tanker remembers your choice, and they come back as soon as you switch them on or turn Tanker off. If you have already turned rocks off in BeamNG.Earth's own settings, they stay off. Your save still works.
+
 ## Build 1 · 31 Oct 2026
 
 - **The first playable skeleton of Tanker.** Press **Start the run** to be teleported to Port Wakefield, at the edge of the desert north of Adelaide, and head north for Pine Gap. There is one run and one save, with no restarts.

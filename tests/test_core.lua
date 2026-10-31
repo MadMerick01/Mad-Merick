@@ -101,6 +101,31 @@ c6:tick(0.01)
 T.check(drawn > 0, 'wrist HUD drawn with hand tracking')
 T.eq(F.controller(F.adapter(-31.0, 140.0)):view().ammo, nil, 'no ammo shown without the pistol')
 
+-- Desert rocks: On by default, Off hides them and is remembered; shutting down puts them back.
+local adapter8 = F.adapter(-31.0, 140.0)
+local c8, env8 = F.controller(adapter8)
+run(c8, 1)
+T.eq(c8:view().rocks.on, true, 'rocks on by default')
+T.eq(c8:view().rocks.status, 'shown', 'rocks shown')
+T.eq(c8:setDesertRocks(false), true, 'rocks off')
+T.eq(adapter8.rocksShown, false, 'Earth asked to hide them')
+T.eq(env8.io.files['/settings/tanker/options.json'].desertRocks, false, 'choice saved')
+local c8b = F.controller(adapter8, { io = env8.io })
+run(c8b, 1)
+T.eq(c8b:view().rocks.on, false, 'choice kept next session')
+c8b:shutdown()
+T.eq(adapter8.rocksShown, true, 'rocks put back when Tanker goes')
+local adapter9 = F.adapter(-31.0, 140.0)
+adapter9.earthRocksOff = true
+local c9 = F.controller(adapter9)
+run(c9, 1)
+T.eq(c9:view().rocks.status, 'hidden_by_earth', 'Earth\'s own setting shown')
+local io10 = F.io()
+io10.files['/settings/tanker/options.json'] = { desertRocks = 'maybe' }
+local c10 = F.controller(F.adapter(-31.0, 140.0), { io = io10 })
+run(c10, 1)
+T.eq(c10:view().rocks.on, true, 'a broken options file means the defaults')
+
 -- A broken config is never ignored.
 local io7 = F.io()
 io7.files['/settings/tanker/config.json'] = { wrist = 'maybe' }

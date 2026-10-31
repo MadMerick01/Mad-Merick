@@ -4,7 +4,7 @@ angular.module('beamng.apps').directive('tankerHud', [function () {
   // kept out here and the new app carries on where the old one was.
   var kept = { tab: 'road', open: true }
   // The commands the HUD may send, each only while Lua says it is allowed.
-  var COMMANDS = { startRun: 'startAllowed', goToSave: 'goToSaveAllowed', save: 'saveAllowed' }
+  var COMMANDS = { startRun: 'startAllowed', goToSave: 'goToSaveAllowed', save: 'saveAllowed', rocksOn: 'rocksAllowed', rocksOff: 'rocksAllowed' }
   return {
     templateUrl: '/ui/modules/apps/Tanker/app.html',
     replace: true,

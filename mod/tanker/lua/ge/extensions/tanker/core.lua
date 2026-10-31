@@ -3,6 +3,7 @@
 -- Adelaide, drive north, and save on the way. Hoons, tankers, siphoning and looting come next.
 local location = require('tanker/location')
 local config = require('tanker/config')
+local options = require('tanker/options')
 local persistence = require('tanker/persistence')
 local diagnostics = require('tanker/diagnostics')
 local hud = require('tanker/hud')
@@ -50,6 +51,7 @@ function M.new(env)
       return self:transition('ERROR', why)
     end
     self.config = settings
+    self.options = options.load(env.io)
     local save, status = self.store:load()
     if save then
       self.profile = save
@@ -94,6 +96,24 @@ function M.new(env)
   function c:goToSave()
     if self.state ~= 'AWAY' or not self.profile then return false end
     return self:sendTo(self.profile.resume, 'Tanker save', 'TO_SAVE')
+  end
+
+  -- Desert rocks On / Off, from the HUD. Kept at once in options.json and applied at the next sample.
+  function c:setDesertRocks(on)
+    if not self.options then return false end
+    self.options.desertRocks = on == true
+    if not options.save(env.io, self.options) then
+      self.diag:event('options_save_failed', 'desertRocks', 'W')
+    end
+    self:applyRocks()
+    return true
+  end
+
+  function c:applyRocks()
+    if not (self.options and self.adapter.rocks) then return end
+    local status = self.adapter:rocks(self.options.desertRocks)
+    if status ~= self.rocks then self.diag:event('rocks', tostring(status)) end
+    self.rocks = status
   end
 
   function c:saveBlocked()
@@ -169,6 +189,7 @@ function M.new(env)
   function c:sample()
     self.here = self.adapter:sample()
     if self.state == 'ERROR' or self.state == 'STARTING' then return end
+    self:applyRocks()
     if not self.here.valid then
       self.diag:event('position', tostring(self.here.reason))
       return
@@ -211,6 +232,10 @@ function M.new(env)
       v.progress = route.progress(here, self:start())
     end
     if self.profile then v.drivenKm = self.profile.run.drivenKm end
+    if self.options then
+      v.rocksAllowed = true
+      v.rocks = { on = self.options.desertRocks, status = self.rocks }
+    end
     if self.reading then
       local r = self.profile and self.profile.run or {}
       v.fuel = { litres = self.reading.litres, capacity = self.reading.capacity,
@@ -258,6 +283,11 @@ function M.new(env)
 
   function c:endMission()
     self.teleport = nil
+  end
+
+  -- Tanker going away puts back the rocks it hid.
+  function c:shutdown()
+    if self.adapter.restoreRocks then self.adapter:restoreRocks() end
   end
 
   return c
@@ -317,6 +347,8 @@ function M.onPreRender(dtReal) return safely(function() ensure():tick(dtReal) en
 function M.startRun() return safely(function() return ensure():startRun() end) end
 function M.goToSave() return safely(function() return ensure():goToSave() end) end
 function M.save() return safely(function() return ensure():manualSave() end) end
+function M.rocksOn() return safely(function() return ensure():setDesertRocks(true) end) end
+function M.rocksOff() return safely(function() return ensure():setDesertRocks(false) end) end
 -- The truck's answers to fuel.lua's commands.
 function M.fuelReading(vehicleId, litres, capacity)
   return safely(function() if active then active:fuelReading(vehicleId, litres, capacity) end end)
@@ -329,6 +361,9 @@ function M.getState() return safely(function() return ensure():view() end) end
 function M.reload() return safely(function() ensure():reload() end) end
 function M.onClientStartMission() return M.reload() end
 function M.onClientEndMission() return safely(function() if active then active:endMission() end end) end
-function M.onExtensionUnloaded() active = nil end -- no implicit save on shutdown
+function M.onExtensionUnloaded() -- no implicit save on shutdown
+  if active then safely(function() active:shutdown() end) end
+  active = nil
+end
 
 return M
