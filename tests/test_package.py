@@ -20,7 +20,7 @@ class PackageTest(unittest.TestCase):
             for name in ('scripts/madMerick/modScript.lua', 'lua/ge/extensions/madMerick/core.lua',
                          'lua/ge/extensions/madMerick/wrist.lua', 'ui/modules/apps/MadMerick/app.json',
                          'ui/modules/apps/MadMerick/app.js', 'ui/modules/apps/MadMerick/app.html',
-                         'ui/modules/apps/MadMerick/app.png', 'README.md', 'docs/DESIGN.md', 'config.example.json'):
+                         'ui/modules/apps/MadMerick/app.png', 'README.md', 'CHANGELOG.md', 'docs/DESIGN.md', 'config.example.json'):
                 self.assertIn(name, names)
             self.assertFalse(any(n.startswith(('settings/', 'tests/', 'tools/', 'mad_merick/')) for n in names))
             self.assertFalse(any(n.endswith(('.pyc', 'save-a.json', 'save-b.json')) for n in names))

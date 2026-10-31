@@ -17,12 +17,15 @@ The first skeleton. There are no Hoons or tankers yet.
 
 You need BeamNG.drive with [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth), and for the revolver and the wrist HUD, Rowan's [BeamNG VR Controller Poses](https://github.com/MadMerick01/BeamngVRcontrollerPoses).
 
-1. Build the ZIP with `python tools/package.py` (it lands in `dist/mad-merick.zip`), or download it from a release.
-2. Put `mad-merick.zip` in your BeamNG `mods` folder.
+1. Download [mad-merick.zip](../../releases/latest/download/mad-merick.zip) from the newest release. Every merge to main publishes a new build on the [Releases](../../releases) page, and [CHANGELOG.md](CHANGELOG.md) says what changed.
+2. Put `mad-merick.zip` in your BeamNG `mods` folder without extracting it, replacing any older one.
 3. In game, add the **Mad Merick** app to your UI.
 
 There is one run and one save. To start over while testing, delete `settings/madMerick/save-a.json` and `save-b.json` in your BeamNG user folder. `config.example.json` shows the settings you can put in `settings/madMerick/config.json`, such as a different start.
 
 ## Tests
+
+To build the ZIP yourself, run `python tools/package.py` (it lands in `dist/mad-merick.zip`).
+
 
 `python tests/run.py` runs the Lua tests (with LuaJIT, or `pip install -r tests/requirements.txt` for Lupa), the HUD tests in Node.js and the packaging tests.
