@@ -105,6 +105,22 @@ Other tankers drive the highway, alone or in convoys with escorts. When they see
 
 A downed tanker is the big prize: a lot of fuel, but it takes time to siphon, and the escorts arrive while you do. A siphon moves **1 litre a second** to start (Rowan, 31 Oct), so a few hundred litres means minutes standing still. **❓ OPEN — Q6:** whether you can drive away mid-siphon with what you have so far.
 
+## Spawning from traffic
+
+Decided by Rowan, 31 Oct: **Hoons and tankers come from BeamNG's own traffic.** Spawning a car mid-drive loads it and causes a frame hitch. Traffic loads its cars once, when it starts, and then only moves them: a traffic car out of sight is picked up and put back on another road ahead of you. Mad Merick uses the same trick.
+
+- **The pool.** When the game starts, traffic is set up with a pool that already holds rat rods and tankers. The one hitch happens there, behind the loading screen.
+- **An encounter.** When a Hoon attack or a tanker sighting is due, Mad Merick takes a pooled car that is out of sight, moves it into place, and switches its AI to chase (Hoons) or flee (tankers).
+- **After the fight.** A looted wreck goes back to traffic, which moves it away once you have driven off, ready to be used again.
+
+Earth Freight already works with traffic on BeamNG.Earth: its traffic police chase and catch the player, and it takes the player's own car in and out of traffic. So traffic runs on Earth's roads, and the police chase is the model for the Hoons.
+
+Things to check in game:
+
+- How many cars the pool can hold before the frame rate suffers, since every car in it is simulated.
+- Whether traffic can carry a tanker trailer, or whether pooled tankers have to be rigid trucks.
+- Whether changing a car's paint or parts forces a reload (and a hitch), so each kind of Hoon needs its own pooled car.
+
 ## The VR revolver
 
 Rowan's [BeamngVRcontrollerPoses](https://github.com/MadMerick01/BeamngVRcontrollerPoses) mod. Hold the right grip to draw the revolver, pull the trigger to shoot.
@@ -178,9 +194,9 @@ The job board and pay, towns and their boards, used cars, the helicopter, flight
 
 ## What gets built fresh
 
-- **Hoons:** spawning, chase AI (from Earth Enduro's CarKov), when a car counts as down, and loot.
+- **Hoons:** taking them from the traffic pool, chase AI (from Earth Enduro's CarKov), when a car counts as down, and loot.
 - **Hardcore rules:** the single save, the timed tow, and putting broken parts back on load.
-- **Tankers and convoys:** spawning, flee AI, escorts.
+- **Tankers and convoys:** taking them from the traffic pool, flee AI, escorts.
 - **Siphoning:** moving fuel over time from a downed tanker.
 - **Ammo** and the hookup to the pistol's hit event.
 - **Legs:** the route, the leg ends, and difficulty rising leg by leg.
