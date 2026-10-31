@@ -123,6 +123,32 @@ What it needs for Mad Merick (two small changes in the pistol mod, so Mad Merick
 
 Mad Merick needs the pistol installed. **VR first** (Rowan, 31 Oct). A non-VR way to shoot comes later; it should be easy, since the pistol can already fire from the camera.
 
+## The HUD
+
+Like Worldwide Trucking's: a slim strip that is always there, which opens into a few tabs. Fairly simple, but interesting. Rowan (31 Oct): build it **both on screen and on the left wrist in VR**, then keep whichever plays better, or both.
+
+**The strip, always visible:**
+
+- **Fuel:** your own tank and the cargo tank, in litres, with a range estimate ("Range 140 km").
+- **Ammo:** six pips for the cylinder, and your spare rounds.
+- **Pine Gap:** distance left.
+- **Threat light:** off, amber when a Hoon is near, red when one is on you. It still shows when the HUD is minimised, like Worldwide Trucking's gold and red dot.
+
+**Three tabs:**
+
+1. **Road:** distance to the next leg end, which way anything spotted is (a tanker, a Hoon pack), and the save button, greyed out while Hoons are close.
+2. **Rig:** what is broken, which tyres are flat and how fast the tank is leaking, and your spare parts, each with a Fit button. The Tow button and its 30-second countdown are here too.
+3. **Loot:** only shown beside a downed car. What it carries, the siphon bar filling at 1 L a second, and a "Hoons inbound" warning.
+
+**The radio.** One-line, crackly messages that tell the story as you drive: "Convoy heading south past Woomera", "Pine Gap still transmitting". Cheap to build, and it makes the empty desert feel alive.
+
+### On screen and on the wrist
+
+Both read the same HUD state, which the game sends at most 4 times a second, as in Worldwide Trucking, so they always agree.
+
+- **On screen:** a BeamNG UI app, built from Worldwide Trucking's.
+- **On the wrist:** a small panel drawn on the left hand, like a watch. The pistol mod already tracks the left controller (`vrHands.getPose('left', 'grip')`), and BeamNG can draw shapes and text in the world every frame, the way the revolver itself is drawn. The wrist shows the strip at a glance: fuel, ammo, distance and the threat light. **❓ OPEN — Q9:** does raising the wrist to your face show more (the radio's last message, the siphon bar), and how are buttons such as Tow, Fit and Save pressed in VR?
+
 ## What carries over from Earth Freight
 
 Copied, then adapted. Nothing is shared at run time.
@@ -172,3 +198,4 @@ Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game ov
 - **Q2:** The starting point, the route and its legs.
 - **Q5:** Which vanilla configs are rat rods, and which later Hoon type comes first: exploding, fire or spiked?
 - **Q6:** Can you drive off mid-siphon with what you have so far?
+- **Q9:** What the wrist HUD shows when raised, and how its buttons are pressed in VR.
