@@ -140,7 +140,7 @@ Like Worldwide Trucking's: a slim strip that is always there, which opens into a
 2. **Rig:** what is broken, which tyres are flat and how fast the tank is leaking, and your spare parts, each with a Fit button. The Tow button and its 30-second countdown are here too.
 3. **Loot:** only shown beside a downed car. What it carries, the siphon bar filling at 1 L a second, and a "Hoons inbound" warning.
 
-**The radio.** One-line, crackly messages that tell the story as you drive: "Convoy heading south past Woomera", "Pine Gap still transmitting". Cheap to build, and it makes the empty desert feel alive.
+**No radio for now** (Rowan, 31 Oct). One-line radio messages that tell the story as you drive could come later.
 
 ### On screen and on the wrist
 
@@ -155,7 +155,7 @@ Both read the same HUD state, which the game sends at most 4 times a second, as 
 - **Distance to Pine Gap:** a number drawn as seven-segment digits, each segment a thin bar, like an old digital watch.
 - **Buttons:** flat coloured shapes with a simple icon made of triangles.
 
-The radio's messages are text, so they stay on screen. Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**, the ones that open doors (Rowan, 31 Oct). The on-screen app already sits on BeamNG's VR screen, where those pointers should click it as they click any UI app. The wrist panel is drawn by us, so the game's pointers may not see it; if not, it does what they do: a ray from the right controller's aim pose, highlighted where it lands, and the trigger presses. To check in game first. **❓ OPEN — Q9:** does raising the wrist to your face show more, such as the siphon bar or a tow countdown?
+Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**, the ones that open doors (Rowan, 31 Oct). The on-screen app already sits on BeamNG's VR screen, where those pointers should click it as they click any UI app. The wrist panel is drawn by us, so the game's pointers may not see it; if not, it does what they do: a ray from the right controller's aim pose, highlighted where it lands, and the trigger presses. To check in game first. **❓ OPEN — Q9:** does raising the wrist to your face show more, such as the siphon bar or a tow countdown?
 
 ## What carries over from Earth Freight
 
