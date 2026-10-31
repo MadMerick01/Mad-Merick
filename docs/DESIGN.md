@@ -1,6 +1,6 @@
 # Mad Merick — Design
 
-Status: **design only, nothing built yet.** This doc collects what Rowan decided in the project thread on 31 Oct 2026 (the seven first questions were answered the same day) and marks what is still open. Open questions are tagged **❓ OPEN** inline and gathered in [Open questions](#open-questions) at the end.
+Status: **the first skeleton is built**: the start, fuel, saving, the HUD strip and the wrist HUD (see the README). No Hoons or tankers yet. This doc collects what Rowan decided in the project thread on 31 Oct 2026 (the seven first questions were answered the same day) and marks what is still open. Open questions are tagged **❓ OPEN** inline and gathered in [Open questions](#open-questions) at the end.
 
 ## The pitch
 

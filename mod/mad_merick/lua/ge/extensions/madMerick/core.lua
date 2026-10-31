@@ -1,0 +1,334 @@
+-- The Mad Merick controller: ties the Earth position, the save, the fuel and the pistol together,
+-- builds the HUD's state, and draws the wrist HUD. For now a run is: go to the start near
+-- Adelaide, drive north, and save on the way. Hoons, tankers, siphoning and looting come next.
+local location = require('madMerick/location')
+local config = require('madMerick/config')
+local persistence = require('madMerick/persistence')
+local diagnostics = require('madMerick/diagnostics')
+local hud = require('madMerick/hud')
+local earthAdapter = require('madMerick/earthAdapter')
+local fuel = require('madMerick/fuel')
+local pistol = require('madMerick/pistol')
+local route = require('madMerick/route')
+local threat = require('madMerick/threat')
+local wrist = require('madMerick/wrist')
+local M = {}
+
+-- One-line settings. Tune these after testing in game.
+-- How often the truck's position is read, in seconds.
+local SAMPLE_SECONDS = 0.5
+-- A jump further than this between two readings is a teleport, not driving.
+local TELEPORT_METRES = 500
+-- After a teleport request, how long to wait for Earth to load the terrain and place the truck.
+local TELEPORT_WAIT_SECONDS = 60
+M.TELEPORT_WAIT_SECONDS = TELEPORT_WAIT_SECONDS
+
+local LABELS = {
+  STARTING = 'STARTING UP', NO_EARTH = 'WAITING FOR BEAMNG.EARTH', NEW = 'READY TO START',
+  TO_START = 'HEADING TO THE START', AWAY = 'AWAY FROM YOUR SAVE', TO_SAVE = 'HEADING TO YOUR SAVE',
+  RUNNING = 'ON THE ROAD', ERROR = 'SOMETHING WENT WRONG',
+}
+
+function M.new(env)
+  local c = {
+    state = 'STARTING', diag = diagnostics.new(env.log), hud = hud.new(env.trigger),
+    store = persistence.new(env.io), fuel = env.fuel, pistol = env.pistol, adapter = env.adapter,
+    clock = 0, nextSample = 0, threat = 'clear',
+  }
+
+  function c:transition(state, why)
+    if self.state ~= state then self.diag:event('state', state .. (why and (' ' .. why) or '')) end
+    self.state = state
+  end
+
+  -- Loads the settings and the save, and decides where the player stands.
+  function c:reload()
+    self.profile, self.reading, self.teleport, self.feedback, self.error = nil, nil, nil, nil, nil
+    local settings, why = config.load(env.io)
+    if not settings then
+      self.error, self.feedback = why, 'Your config.json can\'t be read. Fix it or delete it, then reload.'
+      return self:transition('ERROR', why)
+    end
+    self.config = settings
+    local save, status = self.store:load()
+    if save then
+      self.profile = save
+      return self:transition('AWAY', 'loaded')
+    end
+    if status == 'missing' then return self:transition('NEW') end
+    if status == 'unreadable' then
+      self.feedback = 'Your save could not be read. Starting the run again replaces it.'
+      return self:transition('NEW', status)
+    end
+    self.error = status
+    self.feedback = status == 'newer_version' and 'This save is from a newer Mad Merick. Update the mod to carry on.'
+      or 'Your saves can\'t be reached right now. Reload the mod to try again.'
+    return self:transition('ERROR', status)
+  end
+
+  function c:start()
+    return self.config and self.config.start or route.START
+  end
+
+  -- Asks Earth to take the truck somewhere; the arrival is seen from the position.
+  function c:sendTo(point, name, state)
+    local ok, why = self.adapter:teleport(point, name)
+    if not ok then
+      self.feedback = why == 'teleport_refused' and 'BeamNG.Earth could not teleport you. Check its companion is connected.'
+        or 'BeamNG.Earth\'s teleport is not available. Check BeamNG.Earth is running.'
+      self.diag:event('teleport', tostring(why), 'W')
+      return false
+    end
+    self.teleport = { point = location.copy(point), sentAt = self.clock }
+    self.feedback = 'Teleporting. The desert takes a moment to load.'
+    self:transition(state)
+    return true
+  end
+
+  -- Start the run: only with no save, since the run is hardcore and there is one save.
+  function c:startRun()
+    if self.state ~= 'NEW' then return false end
+    return self:sendTo(self:start(), route.START_NAME, 'TO_START')
+  end
+
+  function c:goToSave()
+    if self.state ~= 'AWAY' or not self.profile then return false end
+    return self:sendTo(self.profile.resume, 'Mad Merick save', 'TO_SAVE')
+  end
+
+  function c:saveBlocked()
+    if self.state ~= 'RUNNING' or not self.profile then return 'not_running' end
+    if not (self.here and self.here.valid) then return 'no_position' end
+    if self.threat ~= 'clear' then return 'hoons_near' end
+  end
+
+  function c:write()
+    local p = self.profile
+    p.resume = { latitude = self.here.latitude, longitude = self.here.longitude, heading = self.here.heading }
+    if self.here.vehicle and self.here.vehicle.model then p.vehicle.model = self.here.vehicle.model end
+    if self.reading then p.vehicle.fuelLitres = self.reading.litres end
+    local saved, why = self.store:save(p)
+    if not saved then
+      self.feedback = 'Saving failed. Your last save is untouched; try again.'
+      self.diag:event('save_failed', tostring(why), 'W')
+      return false
+    end
+    self.profile = saved
+    self.feedback = 'Saved here.'
+    return true
+  end
+
+  function c:manualSave()
+    local blocked = self:saveBlocked()
+    if blocked then
+      if blocked == 'hoons_near' then self.feedback = 'You can\'t save with Hoons nearby.' end
+      return false
+    end
+    return self:write()
+  end
+
+  -- A teleport has landed once the truck is near where it was sent.
+  function c:arrived(radius)
+    if not (self.teleport and self.here and self.here.valid) then return false end
+    local metres = location.distance(self.here, self.teleport.point)
+    return metres ~= nil and metres <= radius
+  end
+
+  function c:follow()
+    local here = self.here
+    if self.state == 'TO_START' and self:arrived(route.START_RADIUS_METRES) then
+      self.profile = persistence.newProfile(self:start(), here, here.vehicle)
+      self.teleport, self.last = nil, location.copy(here)
+      self:transition('RUNNING', 'started')
+      if self:write() then self.feedback = 'The run has started. Head north for Pine Gap.' end
+    elseif self.state == 'TO_SAVE' and self:arrived(math.max(self.config.resumeRadiusMetres, route.START_RADIUS_METRES)) then
+      self.teleport, self.last = nil, location.copy(here)
+      -- The tank goes back to what was saved, so quitting never refills it.
+      local litres = self.profile.vehicle.fuelLitres
+      if litres then self.fuel:set(litres, self.profile.generation) end
+      self.feedback = 'Back where you saved.'
+      self:transition('RUNNING', 'resumed')
+    elseif self.state == 'AWAY' and here.valid then
+      local metres = location.distance(here, self.profile.resume)
+      if metres and metres <= self.config.resumeRadiusMetres then
+        self.last = location.copy(here)
+        self:transition('RUNNING', 'at_save')
+      end
+    elseif (self.state == 'TO_START' or self.state == 'TO_SAVE') and self.clock - self.teleport.sentAt > TELEPORT_WAIT_SECONDS then
+      self.teleport = nil
+      self.feedback = 'The teleport did not arrive. Try again.'
+      self:transition(self.state == 'TO_START' and 'NEW' or 'AWAY', 'teleport_timeout')
+    end
+    if self.state == 'RUNNING' and here.valid and self.last then
+      local step = location.distance(self.last, here) or 0
+      if step <= TELEPORT_METRES then self.profile.run.drivenKm = self.profile.run.drivenKm + step / 1000 end
+      self.last = location.copy(here)
+    end
+  end
+
+  function c:sample()
+    self.here = self.adapter:sample()
+    if self.state == 'ERROR' or self.state == 'STARTING' then return end
+    if not self.here.valid then
+      self.diag:event('position', tostring(self.here.reason))
+      return
+    end
+    self:follow()
+    self.fuel:read()
+    -- No Hoons yet: the light stays clear until they hunt you.
+    self.threat = threat.level(env.hoonDistances and env.hoonDistances() or nil)
+  end
+
+  -- The truck's answer to fuel:read(). Litres going down while driving measure the range.
+  function c:fuelReading(_, litres, capacity)
+    if not (location.finite(litres) and location.finite(capacity)) or capacity <= 0 then return end
+    local previous = self.reading
+    self.reading = { litres = litres, capacity = capacity, km = self.profile and self.profile.run.drivenKm }
+    if not (previous and self.profile and self.state == 'RUNNING' and previous.km) then return end
+    local used, km = previous.litres - litres, self.profile.run.drivenKm - previous.km
+    if used > 0 and km >= 0 then
+      local r = self.profile.run
+      r.usedLitres, r.rangeKm = (r.usedLitres or 0) + used, (r.rangeKm or 0) + km
+    end
+  end
+
+  function c:fuelSet(_, _, _, after, capacity)
+    if location.finite(after) and location.finite(capacity) and capacity > 0 then
+      self.reading = { litres = after, capacity = capacity, km = self.profile and self.profile.run.drivenKm }
+    end
+  end
+
+  function c:view()
+    local here = self.here or {}
+    local v = {
+      state = self.state, stateLabel = LABELS[self.state], feedback = self.feedback, threat = self.threat,
+      startName = route.START_NAME, goalName = route.GOAL_NAME,
+      startAllowed = self.state == 'NEW', goToSaveAllowed = self.state == 'AWAY',
+      saveAllowed = self:saveBlocked() == nil, saveBlockedBy = self:saveBlocked() == 'hoons_near' and 'hoons' or nil,
+    }
+    if here.valid then
+      v.goal = route.toGoal(here)
+      v.progress = route.progress(here, self:start())
+    end
+    if self.profile then v.drivenKm = self.profile.run.drivenKm end
+    if self.reading then
+      local r = self.profile and self.profile.run or {}
+      v.fuel = { litres = self.reading.litres, capacity = self.reading.capacity,
+        rangeKm = fuel.range(self.reading.litres, r.usedLitres, r.rangeKm) }
+    end
+    local gun = self.pistol:read()
+    v.pistol = { installed = gun.installed, drawn = gun.drawn }
+    if gun.loaded then v.ammo = { loaded = gun.loaded, spare = gun.spare } end
+    return v
+  end
+
+  -- The wrist HUD, every frame while VR hand tracking runs. The triangles are only rebuilt when
+  -- what they show changes.
+  function c:drawWrist()
+    if not (self.config and self.config.wrist and env.drawTri) then return end
+    local pose = self.pistol:leftHand()
+    if not pose then return end
+    local v = self.lastView or self:view()
+    local key = table.concat({ tostring(v.threat), wrist.digitsFor(v.goal and v.goal.roadKm),
+      tostring(v.fuel and math.floor(v.fuel.litres)), tostring(v.fuel and v.fuel.capacity),
+      tostring(v.ammo and v.ammo.loaded) }, '|')
+    if key ~= self.wristKey then self.wristTris, self.wristKey = wrist.build(v), key end
+    wrist.place(self.wristTris, pose, env.drawTri)
+  end
+
+  function c:mount(on)
+    if self.hud:mount(on, self.clock) then self:publish(true) end
+  end
+
+  function c:publish()
+    self.lastView = self:view()
+    self.hud:publish(self.lastView, self.clock)
+  end
+
+  function c:tick(dt)
+    self.clock = self.clock + (location.finite(dt) and dt > 0 and dt or 0)
+    if self.state == 'STARTING' then self:reload() end
+    if self.clock >= self.nextSample then
+      self.nextSample = self.clock + SAMPLE_SECONDS
+      self:sample()
+      self:publish()
+    end
+    self:drawWrist()
+  end
+
+  function c:endMission()
+    self.teleport = nil
+  end
+
+  return c
+end
+
+-- --------------------------------------------------------------- the game's side ---
+
+local active
+local function gameIO()
+  return {
+    read = function(path) return jsonReadFile(path) end,
+    exists = function(path) return FS:fileExists(path) end,
+    mkdir = function(path)
+      if not FS:directoryExists(path) then FS:directoryCreate(path, true) end
+      return FS:directoryExists(path)
+    end,
+    write = function(path, data) return jsonWriteFile(path, data, false) end,
+  }
+end
+-- Draws one wrist triangle with the debug drawer, as the revolver is drawn. The corners are
+-- reused vec3s, so drawing makes no garbage.
+local va, vb, vc
+local function drawTri(ax, ay, az, bx, by, bz, cx, cy, cz, colour)
+  if not (debugDrawer and vec3 and color) then return end
+  if not va then va, vb, vc = vec3(), vec3(), vec3() end
+  va:set(ax, ay, az) vb:set(bx, by, bz) vc:set(cx, cy, cz)
+  debugDrawer:drawTriSolid(va, vb, vc, color(colour[1], colour[2], colour[3], 255))
+end
+local function ensure()
+  if not active then
+    active = M.new({ io = gameIO(), adapter = earthAdapter.new(), fuel = fuel.new(), pistol = pistol.new(),
+      log = rawget(_G, 'log'), drawTri = drawTri,
+      trigger = function(event, payload) if guihooks then guihooks.trigger(event, payload) end end })
+  end
+  return active
+end
+local function traced(e)
+  return type(debug) == 'table' and type(debug.traceback) == 'function' and debug.traceback(tostring(e), 2) or tostring(e)
+end
+local function safely(f)
+  local ok, result = xpcall(f, traced)
+  if not ok then
+    if active then
+      active.error, active.feedback = 'internal_error', 'Anything since your last save is lost when you reload.'
+      active:transition('ERROR', 'internal_error')
+      active.diag:event('internal_error', tostring(result), 'E')
+    elseif log then log('E', 'madMerick', tostring(result)) end
+    return false
+  end
+  return result
+end
+
+function M.onExtensionLoaded()
+  return safely(function() ensure().diag:event('extension_loaded', 'Mad Merick') end)
+end
+function M.onPreRender(dtReal) return safely(function() ensure():tick(dtReal) end) end
+function M.startRun() return safely(function() return ensure():startRun() end) end
+function M.goToSave() return safely(function() return ensure():goToSave() end) end
+function M.save() return safely(function() return ensure():manualSave() end) end
+-- The truck's answers to fuel.lua's commands.
+function M.fuelReading(vehicleId, litres, capacity)
+  return safely(function() if active then active:fuelReading(vehicleId, litres, capacity) end end)
+end
+function M.fuelSet(vehicleId, serial, before, after, capacity)
+  return safely(function() if active then active:fuelSet(vehicleId, serial, before, after, capacity) end end)
+end
+function M.uiMounted(on) return safely(function() ensure():mount(on == true) end) end
+function M.getState() return safely(function() return ensure():view() end) end
+function M.reload() return safely(function() ensure():reload() end) end
+function M.onClientStartMission() return M.reload() end
+function M.onClientEndMission() return safely(function() if active then active:endMission() end end) end
+function M.onExtensionUnloaded() active = nil end -- no implicit save on shutdown
+
+return M
