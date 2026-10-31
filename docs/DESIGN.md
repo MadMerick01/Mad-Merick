@@ -109,9 +109,10 @@ A downed tanker is the big prize: a lot of fuel, but it takes time to siphon, an
 
 Decided by Rowan, 31 Oct: **Hoons and tankers come from BeamNG's own traffic.** Spawning a car mid-drive loads it and causes a frame hitch. Traffic loads its cars once, when it starts, and then only moves them: a traffic car out of sight is picked up and put back on another road ahead of you. Mad Merick uses the same trick.
 
-- **The pool.** When the game starts, traffic is set up with a pool that already holds rat rods and tankers. The one hitch happens there, behind the loading screen.
+- **The pool.** When the game starts, traffic is set up with a pool that already holds rat rods and tankers. The one hitch happens there, behind the loading screen. Traffic runs at least 7 cars, which is plenty (Rowan, 31 Oct): **one type of rat rod and a tanker to start**, 3 or 4 Hoon types at most later.
+- **Where traffic puts its cars.** A traffic car nobody is in, once it is out of sight and far enough behind you, is reset and put back down on a road further ahead, often in a new paint. Earth Freight already works around this for the player's parked car. So a car stays a traffic car only while it is just driving around; once it becomes a Hoon or a target tanker it is taken out of traffic, the same way Earth Freight parks the player's car, and given back once it is looted and left behind.
 - **An encounter.** When a Hoon attack or a tanker sighting is due, Mad Merick takes a pooled car that is out of sight, moves it into place, and switches its AI to chase (Hoons) or flee (tankers).
-- **After the fight.** A looted wreck goes back to traffic, which moves it away once you have driven off, ready to be used again.
+- **After the fight.** A looted wreck goes back to traffic, which resets it and moves it away once you have driven off, ready to be used again.
 
 Earth Freight already works with traffic on BeamNG.Earth: its traffic police chase and catch the player, and it takes the player's own car in and out of traffic. So traffic runs on Earth's roads, and the police chase is the model for the Hoons.
 
@@ -120,6 +121,7 @@ Things to check in game:
 - How many cars the pool can hold before the frame rate suffers, since every car in it is simulated.
 - Whether traffic can carry a tanker trailer, or whether pooled tankers have to be rigid trucks.
 - Whether changing a car's paint or parts forces a reload (and a hitch), so each kind of Hoon needs its own pooled car.
+- Where traffic puts cars down on Earth's streamed roads, which only exist near you, and whether it ever picks a road off the route.
 
 ## The VR revolver
 
