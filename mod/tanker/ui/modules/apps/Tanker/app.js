@@ -1,21 +1,21 @@
 /* global angular, bngApi */
-angular.module('beamng.apps').directive('madMerickHud', [function () {
+angular.module('beamng.apps').directive('tankerHud', [function () {
   // What the player was looking at. BeamNG rebuilds the app each time a menu closes, so this is
   // kept out here and the new app carries on where the old one was.
   var kept = { tab: 'road', open: true }
   // The commands the HUD may send, each only while Lua says it is allowed.
   var COMMANDS = { startRun: 'startAllowed', goToSave: 'goToSaveAllowed', save: 'saveAllowed' }
   return {
-    templateUrl: '/ui/modules/apps/MadMerick/app.html',
+    templateUrl: '/ui/modules/apps/Tanker/app.html',
     replace: true,
     link: function (scope) {
       'use strict'
       var disposed = false
       var lastMessage = Date.now()
-      var waiting = { state: 'STARTING', stateLabel: 'WAITING FOR MAD MERICK', threat: 'clear' }
+      var waiting = { state: 'STARTING', stateLabel: 'WAITING FOR TANKER', threat: 'clear' }
       scope.data = waiting
       var core = function (body) {
-        if (typeof bngApi !== 'undefined' && bngApi.engineLua) bngApi.engineLua('if madMerick_core then madMerick_core.' + body + ' end')
+        if (typeof bngApi !== 'undefined' && bngApi.engineLua) bngApi.engineLua('if tanker_core then tanker_core.' + body + ' end')
       }
       var mount = function (on) { core('uiMounted(' + (on ? 'true' : 'false') + ')') }
 
@@ -49,7 +49,7 @@ angular.module('beamng.apps').directive('madMerickHud', [function () {
       }
       scope.threatColour = function (t) { return t === 'red' ? '#eb5757' : t === 'amber' ? '#f2994a' : '#3c403c' }
 
-      scope.$on('MadMerickState', function (event, data) {
+      scope.$on('TankerState', function (event, data) {
         if (disposed || !data || typeof data.state !== 'string') return
         lastMessage = Date.now()
         scope.$evalAsync(function () { if (!disposed) scope.data = data })
@@ -61,8 +61,8 @@ angular.module('beamng.apps').directive('madMerickHud', [function () {
         if (Date.now() - lastMessage > 6000) {
           scope.$evalAsync(function () {
             if (disposed) return
-            scope.data = { state: 'STARTING', stateLabel: 'WAITING FOR MAD MERICK', threat: 'clear',
-              feedback: 'Mad Merick is not responding. Check that the mod is enabled, then reload it.' }
+            scope.data = { state: 'STARTING', stateLabel: 'WAITING FOR TANKER', threat: 'clear',
+              feedback: 'Tanker is not responding. Check that the mod is enabled, then reload it.' }
           })
         }
       }, 3000)

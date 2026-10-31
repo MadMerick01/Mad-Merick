@@ -7,7 +7,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 def build(output: Path) -> Path:
     root = Path(__file__).resolve().parents[1]
-    source = root / 'mod' / 'mad_merick'
+    source = root / 'mod' / 'tanker'
     entries = {}
     for path in sorted(source.rglob('*')):
         if path.is_symlink():
@@ -33,5 +33,5 @@ def build(output: Path) -> Path:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path,
-                        default=Path(__file__).resolve().parents[1] / 'dist' / 'mad-merick.zip')
+                        default=Path(__file__).resolve().parents[1] / 'dist' / 'tanker.zip')
     print(build(parser.parse_args().output))

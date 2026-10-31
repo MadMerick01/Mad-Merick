@@ -1,5 +1,5 @@
 local T = dofile((arg[0]:match('^(.*)[/\\]') or '.') .. '/testlib.lua')
-local W = require('madMerick/wrist')
+local W = require('tanker/wrist')
 
 local function lit(ch)
   local out = {}

@@ -3,10 +3,10 @@ import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
 import test from 'node:test'
 
-const APP = '../mod/mad_merick/ui/modules/apps/MadMerick/'
+const APP = '../mod/tanker/ui/modules/apps/Tanker/'
 const source = readFileSync(new URL(APP + 'app.js', import.meta.url), 'utf8')
 const html = readFileSync(new URL(APP + 'app.html', import.meta.url), 'utf8')
-const fixed = body => 'if madMerick_core then madMerick_core.' + body + ' end'
+const fixed = body => 'if tanker_core then tanker_core.' + body + ' end'
 
 function app() {
   const commands = [], handlers = {}, timers = new Map()
@@ -15,13 +15,13 @@ function app() {
   vm.runInNewContext(source, {
     angular: { module(name) {
       assert.equal(name, 'beamng.apps')
-      return { directive(id, factory) { assert.equal(id, 'madMerickHud'); definition = factory.at(-1)() } }
+      return { directive(id, factory) { assert.equal(id, 'tankerHud'); definition = factory.at(-1)() } }
     } },
     bngApi: { engineLua: command => commands.push(command) },
     setInterval: fn => { timers.set(1, fn); return 1 }, clearInterval: id => timers.delete(id), Date: { now: () => clock }
   })
   definition.link(scope)
-  const a = { scope, commands, handlers, state: data => handlers.MadMerickState({}, data),
+  const a = { scope, commands, handlers, state: data => handlers.TankerState({}, data),
     advance: ms => { clock += ms; for (const tick of timers.values()) tick() } }
   // BeamNG rebuilds the app when a menu closes: the old one is destroyed and a new one linked.
   a.remount = () => {

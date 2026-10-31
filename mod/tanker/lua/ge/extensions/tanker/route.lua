@@ -1,5 +1,5 @@
 -- The run: where it starts and where it is going. Pure maths; no game globals.
-local location = require('madMerick/location')
+local location = require('tanker/location')
 local M = {}
 
 -- One-line settings. Tune these after testing in game.

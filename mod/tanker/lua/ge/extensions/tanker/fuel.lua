@@ -1,6 +1,6 @@
 -- Fuel. BeamNG already burns fuel as you drive (more with a heavy load); this reads the player
 -- truck's tank and sets it, to put the tank back as it was saved when a session starts. Copied from
--- Earth Freight. The truck answers through madMerick_core.fuelReading and madMerick_core.fuelSet.
+-- Earth Freight. The truck answers through tanker_core.fuelReading and tanker_core.fuelSet.
 -- Every game call is guarded: a missing or changed one means no reading.
 local M = {}
 
@@ -31,7 +31,7 @@ end
 ]]
 -- The outer string.format fills in the car's id; %% escapes the car's own format string.
 local READ = TANKS .. [[
-obj:queueGameEngineLua(string.format('if madMerick_core then madMerick_core.fuelReading(%%d, %%.3f, %%.3f) end', %d, litres, capacity))
+obj:queueGameEngineLua(string.format('if tanker_core then tanker_core.fuelReading(%%d, %%.3f, %%.3f) end', %d, litres, capacity))
 ]]
 -- Sets every tank to the same share of full, so the total is the target, and reports before and
 -- after. The outer string.format fills in the target, the car's id and the serial; %% escapes the
@@ -44,7 +44,7 @@ for _, s in ipairs(tanks) do
 end
 local after = 0
 for _, s in ipairs(tanks) do after = after + (s.remainingVolume or 0) end
-obj:queueGameEngineLua(string.format('if madMerick_core then madMerick_core.fuelSet(%%d, %%d, %%.3f, %%.3f, %%.3f) end', %d, %d, before, after, capacity))
+obj:queueGameEngineLua(string.format('if tanker_core then tanker_core.fuelSet(%%d, %%d, %%.3f, %%.3f, %%.3f) end', %d, %d, before, after, capacity))
 ]]
 
 -- How far this many litres goes, in km, at the rate measured so far (litres used over km driven).

@@ -1,5 +1,5 @@
 local dir = (arg[0]:match('^(.*)[/\\]') or '.')
-package.path = dir .. '/../mod/mad_merick/lua/ge/extensions/?.lua;' .. dir .. '/?.lua;' .. package.path
+package.path = dir .. '/../mod/tanker/lua/ge/extensions/?.lua;' .. dir .. '/?.lua;' .. package.path
 local T = { passed = 0, failed = 0 }
 function T.check(ok, message)
   if ok then T.passed = T.passed + 1 else T.failed = T.failed + 1; print('FAIL: ' .. message) end

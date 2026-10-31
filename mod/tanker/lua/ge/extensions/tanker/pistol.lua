@@ -1,4 +1,4 @@
--- Rowan's VR revolver (BeamngVRcontrollerPoses), a separate mod Mad Merick needs installed. This
+-- Rowan's VR revolver (BeamngVRcontrollerPoses), a separate mod Tanker needs installed. This
 -- only reads it: whether it is there, whether it is drawn, and its ammo once the pistol has ammo.
 -- Every call is guarded, so a missing pistol or a changed function means nothing is shown, never an error.
 local M = {}

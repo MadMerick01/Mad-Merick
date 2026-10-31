@@ -1,7 +1,7 @@
--- Settings a player or tester can change in /settings/madMerick/config.json. A missing file means
+-- Settings a player or tester can change in /settings/tanker/config.json. A missing file means
 -- the defaults; a file that is present but invalid is never ignored or replaced.
-local location = require('madMerick/location')
-local M = { FILE = '/settings/madMerick/config.json' }
+local location = require('tanker/location')
+local M = { FILE = '/settings/tanker/config.json' }
 
 function M.defaults()
   -- Each caller receives a fresh table. start, when set, moves where a new run begins (handy for
