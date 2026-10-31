@@ -147,7 +147,15 @@ Like Worldwide Trucking's: a slim strip that is always there, which opens into a
 Both read the same HUD state, which the game sends at most 4 times a second, as in Worldwide Trucking, so they always agree.
 
 - **On screen:** a BeamNG UI app, built from Worldwide Trucking's.
-- **On the wrist:** a small panel drawn on the left hand, like a watch. The pistol mod already tracks the left controller (`vrHands.getPose('left', 'grip')`), and BeamNG can draw shapes and text in the world every frame, the way the revolver itself is drawn. The wrist shows the strip at a glance: fuel, ammo, distance and the threat light. Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**, the ones that open doors (Rowan, 31 Oct). The on-screen app already sits on BeamNG's VR screen, where those pointers should click it as they click any UI app. The wrist panel is drawn by us, so the game's pointers may not see it; if not, it does what they do: a ray from the right controller's aim pose, highlighted where it lands, and the trigger presses. To check in game first. **❓ OPEN — Q9:** does raising the wrist to your face show more (the radio's last message, the siphon bar)?
+- **On the wrist:** a small panel drawn on the left hand, like a watch. The pistol mod already tracks the left controller (`vrHands.getPose('left', 'grip')`), and the panel is drawn the same way as the revolver: flat-coloured triangles from the debug drawer, every frame. **No textures and no text** (Rowan, 31 Oct): textures drew too slowly and lagged when the revolver was built. So the wrist shows the strip as simple shapes:
+
+- **Fuel:** two bars, your own tank and the cargo tank, that shrink as they empty.
+- **Ammo:** six pips in a ring, like the cylinder, lit or dark.
+- **Threat light:** one square, off, amber or red.
+- **Distance to Pine Gap:** a number drawn as seven-segment digits, each segment a thin bar, like an old digital watch.
+- **Buttons:** flat coloured shapes with a simple icon made of triangles.
+
+The radio's messages are text, so they stay on screen. Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**, the ones that open doors (Rowan, 31 Oct). The on-screen app already sits on BeamNG's VR screen, where those pointers should click it as they click any UI app. The wrist panel is drawn by us, so the game's pointers may not see it; if not, it does what they do: a ray from the right controller's aim pose, highlighted where it lands, and the trigger presses. To check in game first. **❓ OPEN — Q9:** does raising the wrist to your face show more, such as the siphon bar or a tow countdown?
 
 ## What carries over from Earth Freight
 
