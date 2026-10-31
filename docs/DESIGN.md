@@ -6,7 +6,7 @@ Status: **the first skeleton is built**: the start, fuel, saving, the HUD strip 
 
 ## The pitch
 
-A hardcore post-apocalyptic trucking game for BeamNG.drive, played across the real Australian outback on [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth). You start in a fuel tanker built from the worst parts there are, at the edge of the desert near Adelaide, and you try to drive it 1,500 km north to Pine Gap, which turns out to be only the beginning. There are almost no stops. Every litre of fuel, every round of ammunition and every spare part comes from someone else: Hoons in rat rods who chase you down, or other tankers you chase down yourself. You defend yourself with a VR revolver.
+A hardcore post-apocalyptic trucking game for BeamNG.drive, played across the real Australian outback on [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth). You start in a fuel tanker built from the worst parts there are, at Yorkeys Crossing outside Port Augusta, where the desert begins, and you try to drive it about 1,250 km north to Pine Gap, which turns out to be only the beginning. There are almost no stops. Every litre of fuel, every round of ammunition and every spare part comes from someone else: Hoons in rat rods who chase you down, or other tankers you chase down yourself. You defend yourself with a VR revolver.
 
 It is a separate game from Earth Freight (Worldwide Trucking Career). It reuses Earth Freight's plumbing by copying it, the same way Earth Freight was built from Earth Enduro, and changes the game on top: Earth Freight is about choosing what to carry for pay, Tanker is about surviving the road and taking what you need.
 
@@ -24,18 +24,18 @@ Pine Gap is a real facility. Everything about it in the game is fiction.
 
 ## The route
 
-The first goal is one very long trip, from somewhere near Adelaide at the edge of the desert to Pine Gap (Rowan, 31 Oct). The exact route, its length and how it splits into legs will be worked out as we go. The table below is a first sketch along the Stuart Highway, about 1,500 km or roughly 18 hours of real driving, with each leg harder than the last.
+The first goal is one very long trip, from **Yorkeys Crossing, outside Port Augusta** (32.47125 S, 137.78370 E, Rowan, 31 Oct), to Pine Gap. The exact route and how it splits into legs will be worked out as we go. The table below is a first sketch up the Stuart Highway, about 1,250 km or roughly 15 hours of real driving, with each leg harder than the last.
 
 | Leg | From → to | Roughly | Character |
 |---|---|---|---|
-| 1 | Edge of the desert → Port Augusta | 300 km | The learning leg. Few Hoons, slow ones. |
-| 2 | Port Augusta → Woomera | 180 km | The old rocket range. First tanker convoys. |
-| 3 | Woomera → Coober Pedy | 370 km | Long empty stretch. Fuel gets tight. |
+| 1 | Yorkeys Crossing → Woomera | 180 km | The learning leg past the old rocket range. Few Hoons, slow ones. |
+| 2 | Woomera → Glendambo | 110 km | First tanker convoys. |
+| 3 | Glendambo → Coober Pedy | 250 km | Long empty stretch. Fuel gets tight. |
 | 4 | Coober Pedy → NT border | 320 km | Coober Pedy is the underground town, the one safe place on the route. |
 | 5 | NT border → Alice Springs | 290 km | Heavy Hoon country. |
 | 6 | Alice Springs → Pine Gap | 20 km | The final run to the base. |
 
-Distances are rough, from the real highway, and to be checked in game. **❓ OPEN — Q2:** the starting point, the route and how it splits into legs.
+Distances are rough, from the real highway, and to be checked in game. **❓ OPEN — Q2:** the route and how it splits into legs.
 
 ### The map
 
@@ -222,7 +222,7 @@ Before step 2, test BeamNG's chase and flee AI on Earth's roads, because the res
 Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game over (hardcore, no restarts, free tow), the starting truck (Rowan's config), Hoon cars (vanilla rat rods that ram), siphon speed (1 L a second), VR (VR first), damage between sessions and the 30-second tow.
 
 - **Q1:** What the orders at Pine Gap are, and how the player leaves Australia.
-- **Q2:** The starting point, the route and its legs.
+- **Q2:** The route and its legs.
 - **Q5:** Which vanilla configs are rat rods, and which later Hoon type comes first: exploding, fire or spiked?
 - **Q6:** Can you drive off mid-siphon with what you have so far?
 - **Q9:** What the wrist HUD shows when raised to your face.
