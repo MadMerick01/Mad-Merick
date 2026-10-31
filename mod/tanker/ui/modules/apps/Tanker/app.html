@@ -18,7 +18,7 @@
     <span style="flex:1;text-align:right;" title="Road distance left to Pine Gap"><b>{{whole(data.goal.roadKm)}} km</b> <span class="mm-k">{{data.goal.letters}}</span></span>
   </button>
   <div ng-if="open" class="mm-panel" style="margin-top:6px;padding:10px 12px;">
-    <div style="font-size:11px;font-weight:bold;letter-spacing:2px;color:#e0823c;">MAD MERICK &middot; {{data.stateLabel}}</div>
+    <div style="font-size:11px;font-weight:bold;letter-spacing:2px;color:#e0823c;">TANKER &middot; {{data.stateLabel}}</div>
     <div style="display:flex;gap:6px;margin-top:8px;">
       <button type="button" ng-repeat="t in tabs" class="mm-tab" ng-class="{on: tab === t.id}" ng-click="setTab(t.id)">{{t.label}}</button>
     </div>
@@ -40,7 +40,7 @@
       <div><span class="mm-k">Your tank</span> <span class="mm-v">{{whole(data.fuel.litres)}} of {{whole(data.fuel.capacity)}} L</span></div>
       <div><span class="mm-k">Range</span> <span class="mm-v">{{data.fuel.rangeKm != null ? whole(data.fuel.rangeKm) + ' km' : 'measuring'}}</span></div>
       <div><span class="mm-k">Revolver</span> <span class="mm-v">{{data.pistol.installed ? (data.pistol.drawn ? 'drawn' : 'holstered') : 'not installed'}}</span></div>
-      <div ng-if="data.pistol && !data.pistol.installed" style="margin-top:4px;color:#f2c94c;">Mad Merick needs the BeamNG VR Controller Poses mod for the revolver.</div>
+      <div ng-if="data.pistol && !data.pistol.installed" style="margin-top:4px;color:#f2c94c;">Tanker needs the BeamNG VR Controller Poses mod for the revolver.</div>
       <div class="mm-k" style="margin-top:6px;">Repairs, spare parts and the tow come with the Hoons.</div>
     </div>
     <div ng-if="data.feedback" role="status" style="margin-top:8px;color:#c8bfb2;">{{data.feedback}}</div>

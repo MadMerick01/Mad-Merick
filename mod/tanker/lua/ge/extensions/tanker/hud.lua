@@ -22,7 +22,7 @@ function M.new(trigger)
     local nextKey = key(view)
     if nextKey == previous and now - self.lastFull < 2 then return false end
     if trigger then
-      local ok = pcall(trigger, 'MadMerickState', view)
+      local ok = pcall(trigger, 'TankerState', view)
       if not ok then return false end
     end
     previous, self.lastSend, self.lastFull = nextKey, now, now

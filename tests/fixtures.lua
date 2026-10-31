@@ -45,7 +45,7 @@ end
 
 -- A controller with fakes, and what it sent to the HUD.
 function F.controller(adapter, extra)
-  local core = require('madMerick/core')
+  local core = require('tanker/core')
   local sent = {}
   local env = { io = F.io(), adapter = adapter or F.adapter(-34.19, 138.14), fuel = F.fuel(), pistol = F.pistol(),
     trigger = function(event, view) sent[#sent + 1] = { event = event, view = view } end }

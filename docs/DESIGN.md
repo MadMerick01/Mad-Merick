@@ -1,4 +1,6 @@
-# Mad Merick — Design
+# Tanker — Design
+
+The game was called Mad Merick while it was being planned; Rowan renamed it **Tanker** on 31 Oct 2026. The GitHub repository is still called Mad-Merick.
 
 Status: **the first skeleton is built**: the start, fuel, saving, the HUD strip and the wrist HUD (see the README). No Hoons or tankers yet. This doc collects what Rowan decided in the project thread on 31 Oct 2026 (the seven first questions were answered the same day) and marks what is still open. Open questions are tagged **❓ OPEN** inline and gathered in [Open questions](#open-questions) at the end.
 
@@ -6,7 +8,7 @@ Status: **the first skeleton is built**: the start, fuel, saving, the HUD strip 
 
 A hardcore post-apocalyptic trucking game for BeamNG.drive, played across the real Australian outback on [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth). You start in a fuel tanker built from the worst parts there are, at the edge of the desert near Adelaide, and you try to drive it 1,500 km north to Pine Gap, which turns out to be only the beginning. There are almost no stops. Every litre of fuel, every round of ammunition and every spare part comes from someone else: Hoons in rat rods who chase you down, or other tankers you chase down yourself. You defend yourself with a VR revolver.
 
-It is a separate game from Earth Freight (Worldwide Trucking Career). It reuses Earth Freight's plumbing by copying it, the same way Earth Freight was built from Earth Enduro, and changes the game on top: Earth Freight is about choosing what to carry for pay, Mad Merick is about surviving the road and taking what you need.
+It is a separate game from Earth Freight (Worldwide Trucking Career). It reuses Earth Freight's plumbing by copying it, the same way Earth Freight was built from Earth Enduro, and changes the game on top: Earth Freight is about choosing what to carry for pay, Tanker is about surviving the road and taking what you need.
 
 ## The story
 
@@ -37,7 +39,7 @@ Distances are rough, from the real highway, and to be checked in game. **❓ OPE
 
 ### The map
 
-There is no map to build. BeamNG.Earth streams real terrain anywhere on the planet, and Earth Freight already has an index of real towns that covers Australia. Mad Merick fences play to the mainland: the ocean is the edge of the world, and the route keeps the player heading north.
+There is no map to build. BeamNG.Earth streams real terrain anywhere on the planet, and Earth Freight already has an index of real towns that covers Australia. Tanker fences play to the mainland: the ocean is the edge of the world, and the route keeps the player heading north.
 
 Two things need testing before anything else, because the whole game depends on them:
 
@@ -107,11 +109,11 @@ A downed tanker is the big prize: a lot of fuel, but it takes time to siphon, an
 
 ## Spawning from traffic
 
-Decided by Rowan, 31 Oct: **Hoons and tankers come from BeamNG's own traffic.** Spawning a car mid-drive loads it and causes a frame hitch. Traffic loads its cars once, when it starts, and then only moves them: a traffic car out of sight is picked up and put back on another road ahead of you. Mad Merick uses the same trick.
+Decided by Rowan, 31 Oct: **Hoons and tankers come from BeamNG's own traffic.** Spawning a car mid-drive loads it and causes a frame hitch. Traffic loads its cars once, when it starts, and then only moves them: a traffic car out of sight is picked up and put back on another road ahead of you. Tanker uses the same trick.
 
 - **The pool.** When the game starts, traffic is set up with a pool that already holds rat rods and tankers. The one hitch happens there, behind the loading screen. Traffic runs at least 7 cars, which is plenty (Rowan, 31 Oct): **one type of rat rod and a tanker to start**, 3 or 4 Hoon types at most later.
 - **Where traffic puts its cars.** A traffic car nobody is in, once it is out of sight and far enough behind you, is reset and put back down on a road further ahead, often in a new paint. Earth Freight already works around this for the player's parked car. So a car stays a traffic car only while it is just driving around; once it becomes a Hoon or a target tanker it is taken out of traffic, the same way Earth Freight parks the player's car, and given back once it is looted and left behind.
-- **An encounter.** When a Hoon attack or a tanker sighting is due, Mad Merick takes a pooled car that is out of sight, moves it into place, and switches its AI to chase (Hoons) or flee (tankers).
+- **An encounter.** When a Hoon attack or a tanker sighting is due, Tanker takes a pooled car that is out of sight, moves it into place, and switches its AI to chase (Hoons) or flee (tankers).
 - **After the fight.** A looted wreck goes back to traffic, which resets it and moves it away once you have driven off, ready to be used again.
 
 Earth Freight already works with traffic on BeamNG.Earth: its traffic police chase and catch the player, and it takes the player's own car in and out of traffic. So traffic runs on Earth's roads, and the police chase is the model for the Hoons. Rowan has driven a lot with traffic on Earth and seen no problems (31 Oct).
@@ -133,12 +135,12 @@ What it does today:
 - Every hit reports back to the game with which car was hit and where.
 - There are no drivers to hit, so a car is stopped by its tyres, its damage or its engine.
 
-What it needs for Mad Merick (two small changes in the pistol mod, so Mad Merick never touches its code):
+What it needs for Tanker (two small changes in the pistol mod, so Tanker never touches its code):
 
-1. **Ammo.** It currently fires without limit, every 0.12 s. It needs a six-round cylinder, a reload, and a way for Mad Merick to refuse a shot when you are out of ammo.
-2. **A hit event** other mods can listen to, so Mad Merick hears every hit and decides when a Hoon is down.
+1. **Ammo.** It currently fires without limit, every 0.12 s. It needs a six-round cylinder, a reload, and a way for Tanker to refuse a shot when you are out of ammo.
+2. **A hit event** other mods can listen to, so Tanker hears every hit and decides when a Hoon is down.
 
-Mad Merick needs the pistol installed. **VR first** (Rowan, 31 Oct). A non-VR way to shoot comes later; it should be easy, since the pistol can already fire from the camera.
+Tanker needs the pistol installed. **VR first** (Rowan, 31 Oct). A non-VR way to shoot comes later; it should be easy, since the pistol can already fire from the camera.
 
 ## The HUD
 
@@ -178,7 +180,7 @@ Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**,
 
 Copied, then adapted. Nothing is shared at run time.
 
-| Earth Freight | In Mad Merick |
+| Earth Freight | In Tanker |
 |---|---|
 | `earthAdapter.lua`, `location.lua`, `odometer.lua` | As is: where you are on Earth, distance driven, teleports. |
 | `places.lua` and the tiles | Cut down to Australia, used for the route and leg ends. |

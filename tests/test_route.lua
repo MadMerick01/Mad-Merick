@@ -1,7 +1,7 @@
 local T = dofile((arg[0]:match('^(.*)[/\\]') or '.') .. '/testlib.lua')
-local R = require('madMerick/route')
-local Th = require('madMerick/threat')
-local Fu = require('madMerick/fuel')
+local R = require('tanker/route')
+local Th = require('tanker/threat')
+local Fu = require('tanker/fuel')
 local F = require('fixtures')
 
 local g = R.toGoal(R.START)

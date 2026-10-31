@@ -1,7 +1,7 @@
 local T = dofile((arg[0]:match('^(.*)[/\\]') or '.') .. '/testlib.lua')
 local F = require('fixtures')
-local R = require('madMerick/route')
-local P = require('madMerick/persistence')
+local R = require('tanker/route')
+local P = require('tanker/persistence')
 
 -- Runs the controller for a while, half a second at a time.
 local function run(c, seconds) for _ = 1, math.floor(seconds * 2) do c:tick(0.5) end end
@@ -15,7 +15,7 @@ T.eq(c.state, 'NEW', 'no save means a new run')
 local v = c:view()
 T.eq(v.startAllowed, true, 'Start the run offered'); T.eq(v.saveAllowed, false, 'no saving before the run')
 T.eq(v.threat, 'clear', 'no Hoons yet'); T.check(v.goal.roadKm > 1000, 'distance to Pine Gap shown')
-T.check(#sent > 0 and sent[1].event == 'MadMerickState', 'state sent to the HUD')
+T.check(#sent > 0 and sent[1].event == 'TankerState', 'state sent to the HUD')
 T.eq(c:goToSave(), false, 'no save to go to')
 T.eq(c:startRun(), true, 'start the run')
 T.eq(adapter.teleports[1].name, R.START_NAME, 'teleports to the start')
@@ -103,7 +103,7 @@ T.eq(F.controller(F.adapter(-31.0, 140.0)):view().ammo, nil, 'no ammo shown with
 
 -- A broken config is never ignored.
 local io7 = F.io()
-io7.files['/settings/madMerick/config.json'] = { wrist = 'maybe' }
+io7.files['/settings/tanker/config.json'] = { wrist = 'maybe' }
 local c7 = F.controller(F.adapter(-31.0, 140.0), { io = io7 })
 run(c7, 1)
 T.eq(c7.state, 'ERROR', 'invalid config stops the run')

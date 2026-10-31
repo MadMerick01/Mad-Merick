@@ -1,5 +1,5 @@
 local T = dofile((arg[0]:match('^(.*)[/\\]') or '.') .. '/testlib.lua')
-local P = require('madMerick/persistence')
+local P = require('tanker/persistence')
 local F = require('fixtures')
 
 local io = F.io()

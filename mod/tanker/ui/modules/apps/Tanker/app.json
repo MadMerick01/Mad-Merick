@@ -1,0 +1,14 @@
+{
+  "domElement": "<tanker-hud></tanker-hud>",
+  "name": "Tanker",
+  "types": ["ui.apps.categories.utility"],
+  "description": "Tanker: a hardcore trucking run across the Australian outback on BeamNG.Earth. Fuel, ammo and the distance to Pine Gap.",
+  "css": {"width": "360px", "height": "420px", "top": "100px", "left": "20px"},
+  "author": "Tanker",
+  "version": "0.1.0",
+  "directive": "tankerHud",
+  "appName": "Tanker",
+  "category": "Tanker",
+  "isAuxiliary": false,
+  "interactive": "yes"
+}

@@ -1,17 +1,17 @@
--- The Mad Merick controller: ties the Earth position, the save, the fuel and the pistol together,
+-- The Tanker controller: ties the Earth position, the save, the fuel and the pistol together,
 -- builds the HUD's state, and draws the wrist HUD. For now a run is: go to the start near
 -- Adelaide, drive north, and save on the way. Hoons, tankers, siphoning and looting come next.
-local location = require('madMerick/location')
-local config = require('madMerick/config')
-local persistence = require('madMerick/persistence')
-local diagnostics = require('madMerick/diagnostics')
-local hud = require('madMerick/hud')
-local earthAdapter = require('madMerick/earthAdapter')
-local fuel = require('madMerick/fuel')
-local pistol = require('madMerick/pistol')
-local route = require('madMerick/route')
-local threat = require('madMerick/threat')
-local wrist = require('madMerick/wrist')
+local location = require('tanker/location')
+local config = require('tanker/config')
+local persistence = require('tanker/persistence')
+local diagnostics = require('tanker/diagnostics')
+local hud = require('tanker/hud')
+local earthAdapter = require('tanker/earthAdapter')
+local fuel = require('tanker/fuel')
+local pistol = require('tanker/pistol')
+local route = require('tanker/route')
+local threat = require('tanker/threat')
+local wrist = require('tanker/wrist')
 local M = {}
 
 -- One-line settings. Tune these after testing in game.
@@ -61,7 +61,7 @@ function M.new(env)
       return self:transition('NEW', status)
     end
     self.error = status
-    self.feedback = status == 'newer_version' and 'This save is from a newer Mad Merick. Update the mod to carry on.'
+    self.feedback = status == 'newer_version' and 'This save is from a newer Tanker. Update the mod to carry on.'
       or 'Your saves can\'t be reached right now. Reload the mod to try again.'
     return self:transition('ERROR', status)
   end
@@ -93,7 +93,7 @@ function M.new(env)
 
   function c:goToSave()
     if self.state ~= 'AWAY' or not self.profile then return false end
-    return self:sendTo(self.profile.resume, 'Mad Merick save', 'TO_SAVE')
+    return self:sendTo(self.profile.resume, 'Tanker save', 'TO_SAVE')
   end
 
   function c:saveBlocked()
@@ -304,14 +304,14 @@ local function safely(f)
       active.error, active.feedback = 'internal_error', 'Anything since your last save is lost when you reload.'
       active:transition('ERROR', 'internal_error')
       active.diag:event('internal_error', tostring(result), 'E')
-    elseif log then log('E', 'madMerick', tostring(result)) end
+    elseif log then log('E', 'tanker', tostring(result)) end
     return false
   end
   return result
 end
 
 function M.onExtensionLoaded()
-  return safely(function() ensure().diag:event('extension_loaded', 'Mad Merick') end)
+  return safely(function() ensure().diag:event('extension_loaded', 'Tanker') end)
 end
 function M.onPreRender(dtReal) return safely(function() ensure():tick(dtReal) end) end
 function M.startRun() return safely(function() return ensure():startRun() end) end

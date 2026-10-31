@@ -1,10 +1,10 @@
--- The only Mad Merick module permitted to touch BeamNG.Earth. It never loads/enables Earth or
+-- The only Tanker module permitted to touch BeamNG.Earth. It never loads/enables Earth or
 -- replaces any upstream function. It asks where the player vehicle is geographically and which way
 -- it points. Its writes are setting Earth's GPS destination and, when the player
 -- presses a button, teleporting to the start or back to where they last saved (Earth's own teleport, as its map's Go).
 -- Not tied to an Earth version: each position source is tried in turn and any missing or
--- changed one is skipped, so Earth updates only break Mad Merick if every source changes.
-local location = require('madMerick/location')
+-- changed one is skipped, so Earth updates only break Tanker if every source changes.
+local location = require('tanker/location')
 local M = {}
 
 local function findCore()

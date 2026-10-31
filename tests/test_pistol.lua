@@ -1,5 +1,5 @@
 local T = dofile((arg[0]:match('^(.*)[/\\]') or '.') .. '/testlib.lua')
-local P = require('madMerick/pistol')
+local P = require('tanker/pistol')
 local none = P.new({ pistol = function() return nil end, hands = function() return nil end })
 T.eq(none:read().installed, false, 'no pistol'); T.eq(none:leftHand(), nil, 'no hands')
 local old = P.new({ pistol = function() return { isEquipped = function() return true end } end, hands = function() end })

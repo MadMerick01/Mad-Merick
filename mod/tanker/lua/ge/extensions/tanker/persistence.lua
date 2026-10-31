@@ -2,8 +2,8 @@
 -- Copied from Earth Freight: the slots, validation and vehicle config copy are the same. The schema
 -- holds one hardcore run: where it started, where the truck was saved, the truck and its fuel, and
 -- how far it has come. There is one run and no going back to an earlier save.
-local location = require('madMerick/location')
-local M = { DIRECTORY = '/settings/madMerick/', SCHEMA = 1 }
+local location = require('tanker/location')
+local M = { DIRECTORY = '/settings/tanker/', SCHEMA = 1 }
 local MAX_INTEGER = 9007199254740991
 
 local function integer(n, minimum)
@@ -112,7 +112,7 @@ function M.new(io)
       if not ok or type(present) ~= 'boolean' then return nil, 'storage_unavailable' end
       if present then
         local readOK, data = pcall(io.read, paths[slot])
-        -- A save from a newer Mad Merick is never overwritten, even if the other slot is readable.
+        -- A save from a newer Tanker is never overwritten, even if the other slot is readable.
         if readOK and type(data) == 'table' and data.schemaVersion ~= nil and data.schemaVersion ~= M.SCHEMA then
           return nil, 'newer_version'
         end

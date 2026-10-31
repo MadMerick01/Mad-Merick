@@ -6,7 +6,7 @@ function M.new(write)
     detail = tostring(detail or '')
     if last[key] == detail then return end
     last[key] = detail
-    if write then pcall(write, level or 'I', 'madMerick', key .. ': ' .. detail) end
+    if write then pcall(write, level or 'I', 'tanker', key .. ': ' .. detail) end
   end
   function d:clear(key) last[key] = nil end
   return d
