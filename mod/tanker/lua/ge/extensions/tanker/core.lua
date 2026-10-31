@@ -13,6 +13,7 @@ local pistol = require('tanker/pistol')
 local route = require('tanker/route')
 local threat = require('tanker/threat')
 local wrist = require('tanker/wrist')
+local vehicle = require('tanker/vehicle')
 local M = {}
 
 -- One-line settings. Tune these after testing in game.
@@ -23,17 +24,20 @@ local TELEPORT_METRES = 500
 -- After a teleport request, how long to wait for Earth to load the terrain and place the truck.
 local TELEPORT_WAIT_SECONDS = 60
 M.TELEPORT_WAIT_SECONDS = TELEPORT_WAIT_SECONDS
+-- After asking for the starter truck, how long to wait for it before carrying on without it.
+local SPAWN_WAIT_SECONDS = 10
+M.SPAWN_WAIT_SECONDS = SPAWN_WAIT_SECONDS
 
 local LABELS = {
   STARTING = 'STARTING UP', NO_EARTH = 'WAITING FOR BEAMNG.EARTH', NEW = 'READY TO START',
-  TO_START = 'HEADING TO THE START', AWAY = 'AWAY FROM YOUR SAVE', TO_SAVE = 'HEADING TO YOUR SAVE',
+  TO_START = 'HEADING TO THE START', SPAWNING = 'FETCHING YOUR TRUCK', AWAY = 'AWAY FROM YOUR SAVE', TO_SAVE = 'HEADING TO YOUR SAVE',
   RUNNING = 'ON THE ROAD', ERROR = 'SOMETHING WENT WRONG',
 }
 
 function M.new(env)
   local c = {
     state = 'STARTING', diag = diagnostics.new(env.log), hud = hud.new(env.trigger),
-    store = persistence.new(env.io), fuel = env.fuel, pistol = env.pistol, adapter = env.adapter,
+    store = persistence.new(env.io), fuel = env.fuel, pistol = env.pistol, adapter = env.adapter, vehicles = env.vehicles,
     clock = 0, nextSample = 0, threat = 'clear',
   }
 
@@ -154,20 +158,53 @@ function M.new(env)
     return metres ~= nil and metres <= radius
   end
 
-  function c:follow()
+  -- Puts the player in the starter truck, then starts or resumes the run once it has arrived.
+  -- Without the game's vehicles (or if the swap fails) the run carries on in whatever they drive.
+  function c:fetchTruck(kind)
+    self.spawning = { kind = kind, at = self.clock }
+    self:transition('SPAWNING', kind)
+    local ok, why, detail = self.vehicles and self.vehicles:spawnStarter()
+    if not ok then
+      self.diag:event('starter_truck', tostring(why) .. (detail and (': ' .. detail) or ''), 'W')
+      self:truckArrived()
+    end
+  end
+
+  function c:truckArrived()
+    local kind = self.spawning and self.spawning.kind
+    self.spawning = nil
     local here = self.here
-    if self.state == 'TO_START' and self:arrived(route.START_RADIUS_METRES) then
-      self.profile = persistence.newProfile(self:start(), here, here.vehicle)
-      self.teleport, self.last = nil, location.copy(here)
+    self.last = here and here.valid and location.copy(here) or nil
+    if kind == 'start' then
+      self.profile = persistence.newProfile(self:start(), here,
+        { model = vehicle.STARTER_MODEL, configuration = vehicle.STARTER_NAME })
       self:transition('RUNNING', 'started')
       if self:write() then self.feedback = 'The run has started. Head north for Pine Gap.' end
-    elseif self.state == 'TO_SAVE' and self:arrived(math.max(self.config.resumeRadiusMetres, route.START_RADIUS_METRES)) then
-      self.teleport, self.last = nil, location.copy(here)
+    else
       -- The tank goes back to what was saved, so quitting never refills it.
       local litres = self.profile.vehicle.fuelLitres
       if litres then self.fuel:set(litres, self.profile.generation) end
       self.feedback = 'Back where you saved.'
       self:transition('RUNNING', 'resumed')
+    end
+  end
+
+  -- The game's onVehicleSpawned: the starter truck has arrived when the player's vehicle respawns.
+  function c:vehicleSpawned(id)
+    if self.state == 'SPAWNING' and self.vehicles and self.vehicles:isPlayer(id) then self:truckArrived() end
+  end
+
+  function c:follow()
+    local here = self.here
+    if self.state == 'TO_START' and self:arrived(route.START_RADIUS_METRES) then
+      self.teleport = nil
+      self:fetchTruck('start')
+    elseif self.state == 'TO_SAVE' and self:arrived(math.max(self.config.resumeRadiusMetres, route.START_RADIUS_METRES)) then
+      self.teleport = nil
+      self:fetchTruck('resume')
+    elseif self.state == 'SPAWNING' and self.clock - self.spawning.at > SPAWN_WAIT_SECONDS then
+      self.diag:event('starter_truck', 'no spawn seen; carrying on', 'W')
+      self:truckArrived()
     elseif self.state == 'AWAY' and here.valid then
       local metres = location.distance(here, self.profile.resume)
       if metres and metres <= self.config.resumeRadiusMetres then
@@ -319,6 +356,7 @@ end
 local function ensure()
   if not active then
     active = M.new({ io = gameIO(), adapter = earthAdapter.new(), fuel = fuel.new(), pistol = pistol.new(),
+      vehicles = vehicle.new(),
       log = rawget(_G, 'log'), drawTri = drawTri,
       trigger = function(event, payload) if guihooks then guihooks.trigger(event, payload) end end })
   end
@@ -340,6 +378,7 @@ local function safely(f)
   return result
 end
 
+function M.onVehicleSpawned(vehicleId) return safely(function() if active then active:vehicleSpawned(vehicleId) end end) end
 function M.onExtensionLoaded()
   return safely(function() ensure().diag:event('extension_loaded', 'Tanker') end)
 end

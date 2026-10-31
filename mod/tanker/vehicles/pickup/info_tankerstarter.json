@@ -1,0 +1,45 @@
+{
+  "Body Style":"Pickup",
+  "Config Type":"Factory",
+  "Configuration":"TankerStarter",
+  "InsuranceClass":"dailyDriver",
+  "Population":3000,
+  "Value":32300,
+  "Years":{
+    "max":1991,
+    "min":1986
+  },
+  "defaultMultiPaintSetup":{
+    "name":"tankerstarter Multi Paint Setup",
+    "paint1":{
+      "baseColor":[
+        0.9549999833107,
+        0.9549999833107,
+        0.9549999833107,
+        1.2000000476837
+      ],
+      "class":"hidden",
+      "clearcoat":0,
+      "clearcoatRoughness":0,
+      "metallic":0,
+      "name":"tankerstarter Paint 1",
+      "roughness":0.0700000003
+    },
+    "paint2":{
+      "baseColor":[
+        0.44499999284744,
+        0.44499999284744,
+        0.44499999284744,
+        1.2000000476837
+      ],
+      "class":"hidden",
+      "clearcoat":0,
+      "clearcoatRoughness":0,
+      "metallic":0,
+      "name":"tankerstarter Paint 2",
+      "roughness":0.0700000003
+    },
+    "paint3":"White"
+  },
+  "vehicleSelectorSubGroup":"vehiclesData.pickup.d15_423sport_A.vehicleSelectorSubGroup"
+}

@@ -1,6 +1,6 @@
 # Tanker — Design
 
-The game was called Mad Merick while it was being planned; Rowan renamed it **Tanker** on 31 Oct 2026. The GitHub repository is still called Mad-Merick.
+The game was called Mad Merick while it was being planned; Rowan renamed it **Tanker** on 31 Oct 2026. The GitHub repository was renamed to Tanker the same day.
 
 Status: **the first skeleton is built**: the start, fuel, saving, the HUD strip and the wrist HUD (see the README). No Hoons or tankers yet. This doc collects what Rowan decided in the project thread on 31 Oct 2026 (the seven first questions were answered the same day) and marks what is still open. Open questions are tagged **❓ OPEN** inline and gathered in [Open questions](#open-questions) at the end.
 

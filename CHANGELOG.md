@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+- **You now start in the Tanker starter truck.** When you reach the start, your vehicle is swapped for a white D15 longbed dually pickup with the 4.1 litre six, a 5-speed manual, a bullbar and a big fuel tank in the bed. The **Road** tab says "Fetching your truck" for a moment while it arrives. **Go to your save** puts you back in the same truck with the fuel you saved. Your save still works.
+
 ## Build 2 · 31 Oct 2026
 
 - **Desert rocks can now be switched off.** The **Road** tab has a **Desert rocks** On / Off switch. Off clears BeamNG.Earth's scattered rocks, so the open desert becomes a fast, clear surface for chases, a bit like a salt-lake speed run. Rocks are on by default, Tanker remembers your choice, and they come back as soon as you switch them on or turn Tanker off. If you have already turned rocks off in BeamNG.Earth's own settings, they stay off. Your save still works.
