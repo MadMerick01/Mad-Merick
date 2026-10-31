@@ -147,7 +147,7 @@ Like Worldwide Trucking's: a slim strip that is always there, which opens into a
 Both read the same HUD state, which the game sends at most 4 times a second, as in Worldwide Trucking, so they always agree.
 
 - **On screen:** a BeamNG UI app, built from Worldwide Trucking's.
-- **On the wrist:** a small panel drawn on the left hand, like a watch. The pistol mod already tracks the left controller (`vrHands.getPose('left', 'grip')`), and BeamNG can draw shapes and text in the world every frame, the way the revolver itself is drawn. The wrist shows the strip at a glance: fuel, ammo, distance and the threat light. **❓ OPEN — Q9:** does raising the wrist to your face show more (the radio's last message, the siphon bar), and how are buttons such as Tow, Fit and Save pressed in VR?
+- **On the wrist:** a small panel drawn on the left hand, like a watch. The pistol mod already tracks the left controller (`vrHands.getPose('left', 'grip')`), and BeamNG can draw shapes and text in the world every frame, the way the revolver itself is drawn. The wrist shows the strip at a glance: fuel, ammo, distance and the threat light. Buttons such as Tow, Fit and Save are pressed with **BeamNG's own VR pointers**, the ones that open doors (Rowan, 31 Oct). The on-screen app already sits on BeamNG's VR screen, where those pointers should click it as they click any UI app. The wrist panel is drawn by us, so the game's pointers may not see it; if not, it does what they do: a ray from the right controller's aim pose, highlighted where it lands, and the trigger presses. To check in game first. **❓ OPEN — Q9:** does raising the wrist to your face show more (the radio's last message, the siphon bar)?
 
 ## What carries over from Earth Freight
 
@@ -198,4 +198,4 @@ Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game ov
 - **Q2:** The starting point, the route and its legs.
 - **Q5:** Which vanilla configs are rat rods, and which later Hoon type comes first: exploding, fire or spiked?
 - **Q6:** Can you drive off mid-siphon with what you have so far?
-- **Q9:** What the wrist HUD shows when raised, and how its buttons are pressed in VR.
+- **Q9:** What the wrist HUD shows when raised to your face.
