@@ -15,7 +15,7 @@ The first skeleton. There are no Hoons or tankers yet.
 
 ## Install
 
-You need BeamNG.drive with [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth), and for the revolver and the wrist HUD, Rowan's [BeamNG VR Controller Poses](https://github.com/MadMerick01/BeamngVRcontrollerPoses).
+You need BeamNG.drive with [BeamNG.Earth](https://github.com/TecnaGamer/BeamNG.Earth), and for the revolver and the wrist HUD, MadMerick's [BeamNG VR Controller Poses](https://github.com/MadMerick01/BeamngVRcontrollerPoses).
 
 1. Download [tanker.zip](../../releases/latest/download/tanker.zip) from the newest release. Every merge to main publishes a new build on the [Releases](../../releases) page, and [CHANGELOG.md](CHANGELOG.md) says what changed.
 2. Put `tanker.zip` in your BeamNG `mods` folder without extracting it, replacing any older one.
