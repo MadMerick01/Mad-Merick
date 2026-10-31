@@ -72,13 +72,13 @@ The tank is three things at once:
 
 Decided by Rowan, 31 Oct: **hardcore from the start, no restarts.** You manage your own fuel and repairs. If you run dry or wreck the truck, you have to get yourself out of it with what you are carrying.
 
-**One save.** The game saves where you are, so you can stop playing and carry on later from the same spot. There is no going back to an earlier save. **❓ OPEN — Q3:** what happens to the truck's damage between play sessions (see [Damage between sessions](#damage-between-sessions)).
+**One save.** The game saves where you are, so you can stop playing and carry on later from the same spot. There is no going back to an earlier save. What the truck keeps between play sessions is in [Damage between sessions](#damage-between-sessions).
 
-**Free tow, but you are exposed.** Stuck in a ditch or on your side, you can tow yourself out for free, the same way as in Worldwide Trucking: get out, walk to a clear spot within 50 m, and the truck is brought to you. Unlike Worldwide Trucking, the tow takes time, and Hoons can attack while it happens. **❓ OPEN — Q8:** how long a tow takes, and whether it draws Hoons in.
+**Free tow, but you are exposed.** Stuck in a ditch or on your side, you can tow yourself out for free, the same way as in Worldwide Trucking: get out, walk to a clear spot within 50 m, and the truck is brought to you. Unlike Worldwide Trucking, the tow takes **about 30 seconds of winching** (Rowan, 31 Oct), and there is a good chance a Hoon turns up while you wait.
 
 ### Damage between sessions
 
-BeamNG does not save a car's bent body when the game closes, so the truck has to be rebuilt from what the save holds. The proposal:
+BeamNG does not save a car's bent body when the game closes, so the truck has to be rebuilt from what the save holds. Agreed by Rowan, 31 Oct:
 
 - **Saved:** fuel in each tank, ammo, spare parts, which parts are broken or missing, and which tyres are flat.
 - **Put back on load:** broken parts stay broken, missing parts stay missing, and flat tyres stay flat.
@@ -166,11 +166,9 @@ Before step 2, test BeamNG's chase and flee AI on Earth's roads, because the res
 
 ## Open questions
 
-Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game over (hardcore, no restarts, free tow), the starting truck (Rowan's config), Hoon cars (vanilla rat rods that ram), siphon speed (1 L a second) and VR (VR first).
+Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game over (hardcore, no restarts, free tow), the starting truck (Rowan's config), Hoon cars (vanilla rat rods that ram), siphon speed (1 L a second), VR (VR first), damage between sessions and the 30-second tow.
 
 - **Q1:** What the orders at Pine Gap are, and how the player leaves Australia.
 - **Q2:** The starting point, the route and its legs.
-- **Q3:** Damage between sessions: is the proposal (broken parts and flat tyres kept, dents lost, no saving near Hoons) right?
 - **Q5:** Which vanilla configs are rat rods, and which later Hoon type comes first: exploding, fire or spiked?
 - **Q6:** Can you drive off mid-siphon with what you have so far?
-- **Q8:** How long a tow takes, and whether it draws Hoons in.
