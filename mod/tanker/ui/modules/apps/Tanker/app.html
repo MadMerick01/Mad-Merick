@@ -35,6 +35,13 @@
         <button type="button" class="mm-btn" ng-disabled="!data.saveAllowed" ng-click="send('save')">Save here</button>
         <span ng-if="data.saveBlockedBy === 'hoons'" style="margin-left:6px;color:#eb5757;">Hoons nearby</span>
       </div>
+      <div ng-if="data.rocksAllowed" style="margin-top:10px;" title="Off clears BeamNG.Earth's scattered rocks for fast desert chases">
+        <span class="mm-k">Desert rocks</span>
+        <button type="button" class="mm-tab" ng-class="{on: data.rocks.on}" ng-click="send('rocksOn')">On</button>
+        <button type="button" class="mm-tab" ng-class="{on: !data.rocks.on}" ng-click="send('rocksOff')">Off</button>
+        <div ng-if="data.rocks.on && data.rocks.status === 'hidden_by_earth'" class="mm-k" style="margin-top:4px;">BeamNG.Earth's own Rocks setting has them off.</div>
+        <div ng-if="data.rocks.status === 'unavailable'" class="mm-k" style="margin-top:4px;">Waiting for BeamNG.Earth's scenery.</div>
+      </div>
     </div>
     <div ng-if="tab === 'rig'" style="margin-top:8px;">
       <div><span class="mm-k">Your tank</span> <span class="mm-v">{{whole(data.fuel.litres)}} of {{whole(data.fuel.capacity)}} L</span></div>

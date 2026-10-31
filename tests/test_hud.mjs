@@ -58,6 +58,11 @@ test('buttons only send fixed commands when Lua allows them', () => {
   a.state({ state: 'AWAY', goToSaveAllowed: true })
   a.scope.send('goToSave')
   assert.equal(a.commands.at(-1), fixed('goToSave()'))
+  a.state({ state: 'RUNNING', rocksAllowed: true, rocks: { on: true } })
+  a.scope.send('rocksOff')
+  assert.equal(a.commands.at(-1), fixed('rocksOff()'))
+  a.scope.send('rocksOn')
+  assert.equal(a.commands.at(-1), fixed('rocksOn()'))
 })
 
 test('strip helpers show fuel, ammo and the threat light', () => {

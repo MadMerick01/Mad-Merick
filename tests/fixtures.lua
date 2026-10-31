@@ -25,6 +25,15 @@ function F.adapter(lat, lon)
   if lat == nil then a.here = { valid = false, reason = 'earth_missing' } end
   function a:sample() return self.here end
   function a:put(lat2, lon2) self.here = { valid = true, latitude = lat2, longitude = lon2, heading = 0, vehicle = { model = 'us_semi' } } end
+  -- Earth's rocks: shown unless asked to hide them (or Earth hides them itself).
+  a.rocksShown, a.rockCalls = true, 0
+  function a:rocks(wanted)
+    self.rockCalls = self.rockCalls + 1
+    if self.earthRocksOff then return wanted and 'hidden_by_earth' or 'hidden' end
+    self.rocksShown = wanted == true
+    return wanted and 'shown' or 'hidden'
+  end
+  function a:restoreRocks() self.rocksShown = true end
   function a:teleport(point, name) self.teleports[#self.teleports + 1] = { point = point, name = name }; return self.refuse == nil, self.refuse end
   return a
 end

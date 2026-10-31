@@ -1,7 +1,8 @@
 -- The only Tanker module permitted to touch BeamNG.Earth. It never loads/enables Earth or
 -- replaces any upstream function. It asks where the player vehicle is geographically and which way
--- it points. Its writes are setting Earth's GPS destination and, when the player
--- presses a button, teleporting to the start or back to where they last saved (Earth's own teleport, as its map's Go).
+-- it points. Its writes are setting Earth's GPS destination, when the player
+-- presses a button, teleporting to the start or back to where they last saved (Earth's own teleport, as its map's Go),
+-- and hiding Earth's scattered rocks when the player turns Desert rocks off (Earth's own Rocks setting switch).
 -- Not tied to an Earth version: each position source is tried in turn and any missing or
 -- changed one is skipped, so Earth updates only break Tanker if every source changes.
 local location = require('tanker/location')
@@ -163,6 +164,52 @@ function M.new(environment)
     -- Earth answers false when it cannot, such as with its companion server not connected.
     if sent == false then return false, 'teleport_refused', why ~= nil and tostring(why) or nil end
     return true
+  end
+  -- Desert rocks. Earth scatters rocks as forest items in two groups and its own settings page
+  -- turns both off with trees.setGroupEnabled, which also rebuilds their collision; Tanker uses the
+  -- same switch. Only what Tanker hid is ever shown again, so a player who turned rocks off in
+  -- Earth's settings keeps them off. Called often: it only switches when the state differs, so
+  -- Earth turning them back on (a settings reload) is undone at the next call.
+  -- Returns 'shown', 'hidden' (by Tanker), 'hidden_by_earth' or 'unavailable'.
+  local ROCK_GROUPS = { 'rock', 'desert_rock' }
+  local hidByTanker = false
+  local function trees()
+    local okCore, core = pcall(env.core)
+    if not okCore or type(core) ~= 'table' then return nil end
+    local t = env.module and env.module('trees')
+    if type(t) == 'table' and type(t.setGroupEnabled) == 'function' and type(t.groupOff) == 'table' then return t end
+  end
+  local function anyOff(t)
+    for _, g in ipairs(ROCK_GROUPS) do if t.groupOff[g] == true then return true end end
+    return false
+  end
+  local function allOff(t)
+    for _, g in ipairs(ROCK_GROUPS) do if t.groupOff[g] ~= true then return false end end
+    return true
+  end
+  function a:rocks(wanted)
+    local t = trees()
+    if not t then return 'unavailable' end
+    if wanted then
+      if hidByTanker then
+        hidByTanker = false
+        if not pcall(t.setGroupEnabled, ROCK_GROUPS, true) then return 'unavailable' end
+      end
+      return anyOff(t) and 'hidden_by_earth' or 'shown'
+    end
+    if not allOff(t) then
+      if not pcall(t.setGroupEnabled, ROCK_GROUPS, false) then return 'unavailable' end
+      hidByTanker = true
+    end
+    return 'hidden'
+  end
+  -- Puts back any rocks Tanker hid, when Tanker is switched off or unloaded.
+  function a:restoreRocks()
+    if hidByTanker then
+      hidByTanker = false
+      local t = trees()
+      if t then pcall(t.setGroupEnabled, ROCK_GROUPS, true) end
+    end
   end
   return a
 end
