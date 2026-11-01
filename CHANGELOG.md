@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+## Build 4 · 1 Nov 2026
+
 - **The run now starts at Yorkeys Crossing, outside Port Augusta,** where the Stuart Highway heads north into the desert, instead of Port Wakefield. Pine Gap is about 1,230 km away by road. A save from the old start still works and carries on from where you saved it.
 - **You now start in the Tanker starter truck.** When you reach the start, your vehicle is swapped for a white D15 longbed dually pickup with the 4.1 litre six, a 5-speed manual, a bullbar and a big fuel tank in the bed. The **Road** tab says "Fetching your truck" for a moment while it arrives. **Go to your save** puts you back in the same truck with the fuel you saved. Your save still works.
 
