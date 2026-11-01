@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+- **You can now siphon fuel from other cars.** Stop within about 10 m of any car, parked, crashed or in traffic, and the **Road** tab shows a **Siphon fuel** button with how far away the car is. Press it and fuel moves from their tank into yours at 1 litre a second. A bold **Siphoning** box near the top of the screen shows the litres taken so far, their tank emptying and yours filling. Its border turns red and it says "Hoons nearby!" when Hoons are close. It stops by itself when their tank is dry, your tank is full or you drive off, and you keep everything you took. Press **Stop** in the box, or **Stop siphoning** on the Road tab, to stop it yourself. In VR, a small pip on your wrist blinks green while fuel flows. Your save still works.
+
 ## Build 4 · 1 Nov 2026
 
 - **The run now starts at Yorkeys Crossing, outside Port Augusta,** where the Stuart Highway heads north into the desert, instead of Port Wakefield. Pine Gap is about 1,230 km away by road. A save from the old start still works and carries on from where you saved it.

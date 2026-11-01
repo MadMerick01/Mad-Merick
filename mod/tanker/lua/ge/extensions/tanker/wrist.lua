@@ -1,7 +1,8 @@
 -- The VR wrist HUD: a small panel on the left hand, like a watch. Drawn the same way as the
 -- revolver, as flat-coloured triangles from the debug drawer, because textures and text drew too
 -- slowly and lagged. So everything on it is a shape: two fuel bars, six ammo pips, the threat
--- square and the distance to Pine Gap as seven-segment digits.
+-- square, a siphon pip that blinks while fuel flows, and the distance to Pine Gap as
+-- seven-segment digits.
 -- build() is pure maths: triangles in the panel's own flat space, in metres, x to the right and y
 -- up, centred on the panel. place() turns them into world corners on the hand.
 local M = {}
@@ -86,6 +87,12 @@ function M.build(view)
   local top = h / 2 - 0.004
   local size = 0.012
   rect(out, -w / 2 + 0.005, top - size, -w / 2 + 0.005 + size, top, COLOURS[view.threat] or COLOURS.clear)
+  -- While siphoning, a pip beside it blinks green once a second as the fuel flows.
+  local sip = view.siphon
+  if type(sip) == 'table' and sip.active then
+    local x0 = -w / 2 + 0.005 + size + 0.003
+    rect(out, x0, top - size + 0.003, x0 + 0.006, top - 0.003, sip.blink and COLOURS.fuel or COLOURS.empty)
+  end
   local text = M.digitsFor(view.goal and view.goal.roadKm)
   local dw, dh, dt, gap = 0.007, 0.012, 0.0015, 0.0025
   local x = w / 2 - 0.005 - #text * dw - (#text - 1) * gap
