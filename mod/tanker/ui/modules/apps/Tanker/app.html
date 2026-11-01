@@ -35,6 +35,11 @@
         <button type="button" class="mm-btn" ng-disabled="!data.saveAllowed" ng-click="send('save')">Save here</button>
         <span ng-if="data.saveBlockedBy === 'hoons'" style="margin-left:6px;color:#eb5757;">Hoons nearby</span>
       </div>
+      <div ng-if="data.siphonNear && !data.siphonStopAllowed" style="margin-top:6px;">
+        <button type="button" class="mm-btn" ng-disabled="!data.siphonAllowed" ng-click="send('siphonStart')">Siphon fuel</button>
+        <span class="mm-k" style="margin-left:6px;">{{data.siphonNear.moving ? 'Stop next to the car to siphon' : 'A car ' + whole(data.siphonNear.metres) + ' m away'}}</span>
+      </div>
+      <button type="button" ng-if="data.siphonStopAllowed" class="mm-btn" ng-click="send('siphonStop')">Stop siphoning</button>
       <div ng-if="data.rocksAllowed" style="margin-top:10px;" title="Off clears BeamNG.Earth's scattered rocks for fast desert chases">
         <span class="mm-k">Desert rocks</span>
         <button type="button" class="mm-tab" ng-class="{on: data.rocks.on}" ng-click="send('rocksOn')">On</button>

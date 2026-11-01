@@ -1,6 +1,7 @@
 -- The Tanker controller: ties the Earth position, the save, the fuel and the pistol together,
--- builds the HUD's state, and draws the wrist HUD. For now a run is: go to the start near
--- Adelaide, drive north, and save on the way. Hoons, tankers, siphoning and looting come next.
+-- builds the HUD's state, and draws the wrist HUD. For now a run is: go to the start at Port
+-- Augusta, drive north, siphon fuel from cars you find, and save on the way. Hoons, tankers and
+-- looting come next.
 local location = require('tanker/location')
 local config = require('tanker/config')
 local options = require('tanker/options')
@@ -14,6 +15,8 @@ local route = require('tanker/route')
 local threat = require('tanker/threat')
 local wrist = require('tanker/wrist')
 local vehicle = require('tanker/vehicle')
+local siphon = require('tanker/siphon')
+local nearby = require('tanker/nearby')
 local M = {}
 
 -- One-line settings. Tune these after testing in game.
@@ -38,8 +41,11 @@ function M.new(env)
   local c = {
     state = 'STARTING', diag = diagnostics.new(env.log), hud = hud.new(env.trigger),
     store = persistence.new(env.io), fuel = env.fuel, pistol = env.pistol, adapter = env.adapter, vehicles = env.vehicles,
-    clock = 0, nextSample = 0, threat = 'clear',
+    clock = 0, nextSample = 0, threat = 'clear', nearby = env.nearby,
   }
+  c.siphon = siphon.new(function(litres, serial, id)
+    return env.fuel.change ~= nil and env.fuel:change(litres, serial, id)
+  end)
 
   function c:transition(state, why)
     if self.state ~= state then self.diag:event('state', state .. (why and (' ' .. why) or '')) end
@@ -118,6 +124,59 @@ function M.new(env)
     local status = self.adapter:rocks(self.options.desertRocks)
     if status ~= self.rocks then self.diag:event('rocks', tostring(status)) end
     self.rocks = status
+  end
+
+  -- Siphoning: offered while you stand still beside another car on the road.
+  function c:siphonBlocked()
+    if self.state ~= 'RUNNING' then return 'not_running' end
+    if self.siphon:active() then return 'siphoning' end
+    local near = self.near
+    if not (near and near.metres <= siphon.REACH_METRES) then return 'nothing_near' end
+    if near.speed > siphon.STILL_MPS then return 'moving' end
+  end
+
+  function c:startSiphon()
+    if self:siphonBlocked() then return false end
+    if not self.siphon:start(self.near.id, self.clock) then return false end
+    self.feedback = 'Siphoning. Stay still beside their car.'
+    self.diag:event('siphon', 'start ' .. tostring(self.near.id))
+    return true
+  end
+
+  function c:stopSiphon()
+    if not self.siphon:active() then return false end
+    self.feedback = self.siphon:finish('stopped', self.clock)
+    return true
+  end
+
+  -- Each half second: keeps the siphon going, or looks for a car to offer one from.
+  function c:followSiphon()
+    if not self.nearby then return end
+    if self.state ~= 'RUNNING' then
+      self.near = nil
+      if self.siphon:active() then self.feedback = self.siphon:finish('stopped', self.clock) end
+      return
+    end
+    if self.siphon:active() then
+      local car, me = self.nearby:closest(self.siphon.run.donor)
+      local line = self.siphon:step(self.clock, car and car.metres, me and me.speed, self.reading)
+      if line then self.feedback = line; self.diag:event('siphon', line) end
+      self.near = nil
+      return
+    end
+    local car, me = self.nearby:closest()
+    self.near = car and me and { id = car.id, metres = car.metres, speed = me.speed } or nil
+  end
+
+  -- A car's answer to fuel:change(). Litres put into your own tank show at once.
+  function c:fuelChanged(id, serial, before, after, capacity)
+    local donor = self.siphon.run and self.siphon.run.donor
+    local handled, line = self.siphon:answer(serial, before, after, capacity, self.clock)
+    if not handled then return end
+    if id ~= donor and location.finite(after) and location.finite(capacity) and capacity > 0 then
+      self.reading = { litres = after, capacity = capacity, km = self.profile and self.profile.run.drivenKm }
+    end
+    if line then self.feedback = line; self.diag:event('siphon', line) end
   end
 
   function c:saveBlocked()
@@ -232,6 +291,7 @@ function M.new(env)
       return
     end
     self:follow()
+    self:followSiphon()
     self.fuel:read()
     -- No Hoons yet: the light stays clear until they hunt you.
     self.threat = threat.level(env.hoonDistances and env.hoonDistances() or nil)
@@ -269,6 +329,16 @@ function M.new(env)
       v.progress = route.progress(here, self:start())
     end
     if self.profile then v.drivenKm = self.profile.run.drivenKm end
+    v.siphonAllowed = self:siphonBlocked() == nil
+    v.siphonStopAllowed = self.siphon:active()
+    if self.near and self.near.metres <= siphon.REACH_METRES and self.state == 'RUNNING' then
+      v.siphonNear = { metres = self.near.metres, moving = self.near.speed > siphon.STILL_MPS }
+    end
+    v.siphon = self.siphon:view(self.clock, self.reading)
+    if v.siphon then
+      v.siphon.hoons = self.threat ~= 'clear'
+      v.siphon.blink = math.floor(self.clock) % 2 == 0
+    end
     if self.options then
       v.rocksAllowed = true
       v.rocks = { on = self.options.desertRocks, status = self.rocks }
@@ -293,7 +363,7 @@ function M.new(env)
     local v = self.lastView or self:view()
     local key = table.concat({ tostring(v.threat), wrist.digitsFor(v.goal and v.goal.roadKm),
       tostring(v.fuel and math.floor(v.fuel.litres)), tostring(v.fuel and v.fuel.capacity),
-      tostring(v.ammo and v.ammo.loaded) }, '|')
+      tostring(v.ammo and v.ammo.loaded), tostring(v.siphon and v.siphon.active and v.siphon.blink) }, '|')
     if key ~= self.wristKey then self.wristTris, self.wristKey = wrist.build(v), key end
     wrist.place(self.wristTris, pose, env.drawTri)
   end
@@ -356,7 +426,7 @@ end
 local function ensure()
   if not active then
     active = M.new({ io = gameIO(), adapter = earthAdapter.new(), fuel = fuel.new(), pistol = pistol.new(),
-      vehicles = vehicle.new(),
+      vehicles = vehicle.new(), nearby = nearby.new(),
       log = rawget(_G, 'log'), drawTri = drawTri,
       trigger = function(event, payload) if guihooks then guihooks.trigger(event, payload) end end })
   end
@@ -395,6 +465,11 @@ end
 function M.fuelSet(vehicleId, serial, before, after, capacity)
   return safely(function() if active then active:fuelSet(vehicleId, serial, before, after, capacity) end end)
 end
+function M.fuelChanged(vehicleId, serial, before, after, capacity)
+  return safely(function() if active then active:fuelChanged(vehicleId, serial, before, after, capacity) end end)
+end
+function M.siphonStart() return safely(function() return ensure():startSiphon() end) end
+function M.siphonStop() return safely(function() return ensure():stopSiphon() end) end
 function M.uiMounted(on) return safely(function() ensure():mount(on == true) end) end
 function M.getState() return safely(function() return ensure():view() end) end
 function M.reload() return safely(function() ensure():reload() end) end

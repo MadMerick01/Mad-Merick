@@ -8,7 +8,18 @@ const source = readFileSync(new URL(APP + 'app.js', import.meta.url), 'utf8')
 const html = readFileSync(new URL(APP + 'app.html', import.meta.url), 'utf8')
 const fixed = body => 'if tanker_core then tanker_core.' + body + ' end'
 
-function app() {
+// Just enough of a page for the siphon box.
+function page() {
+  const el = tag => ({ tag, children: [], style: {}, attrs: {}, textContent: '', parentNode: null,
+    setAttribute(k, v) { this.attrs[k] = v },
+    appendChild(c) { c.parentNode = this; this.children.push(c); return c },
+    removeChild(c) { this.children = this.children.filter(x => x !== c); c.parentNode = null } })
+  const body = el('body')
+  return { body, createElement: el }
+}
+const text = node => node.textContent + node.children.map(text).join(' ')
+
+function app(document) {
   const commands = [], handlers = {}, timers = new Map()
   let definition, clock = 0
   const scope = { $on: (name, fn) => { handlers[name] = fn }, $evalAsync: fn => fn() }
@@ -18,7 +29,8 @@ function app() {
       return { directive(id, factory) { assert.equal(id, 'tankerHud'); definition = factory.at(-1)() } }
     } },
     bngApi: { engineLua: command => commands.push(command) },
-    setInterval: fn => { timers.set(1, fn); return 1 }, clearInterval: id => timers.delete(id), Date: { now: () => clock }
+    setInterval: fn => { timers.set(1, fn); return 1 }, clearInterval: id => timers.delete(id), Date: { now: () => clock },
+    document
   })
   definition.link(scope)
   const a = { scope, commands, handlers, state: data => handlers.TankerState({}, data),
@@ -63,6 +75,39 @@ test('buttons only send fixed commands when Lua allows them', () => {
   assert.equal(a.commands.at(-1), fixed('rocksOff()'))
   a.scope.send('rocksOn')
   assert.equal(a.commands.at(-1), fixed('rocksOn()'))
+})
+
+test('siphon buttons and the siphon box', () => {
+  const doc = page()
+  const a = app(doc)
+  a.scope.send('siphonStart')
+  assert.ok(!a.commands.includes(fixed('siphonStart()')), 'no siphon unless offered')
+  a.state({ state: 'RUNNING', siphonAllowed: true, siphonNear: { metres: 4 } })
+  a.scope.send('siphonStart')
+  assert.equal(a.commands.at(-1), fixed('siphonStart()'))
+  assert.equal(doc.body.children.length, 0, 'no box before siphoning')
+  const live = { active: true, litres: 12, theirs: 68, theirsCapacity: 80, yours: 112, yoursCapacity: 300 }
+  a.state({ state: 'RUNNING', siphonStopAllowed: true, siphon: live })
+  assert.equal(doc.body.children.length, 1, 'the box shows')
+  const box = doc.body.children[0]
+  assert.match(text(box), /SIPHONING/); assert.match(text(box), /12 L taken/); assert.match(text(box), /68 of 80 L/)
+  assert.match(box.style.cssText, /#e0823c/, 'orange border')
+  a.state({ state: 'RUNNING', siphonStopAllowed: true, siphon: live })
+  assert.equal(doc.body.children[0], box, 'not redrawn when nothing changed')
+  a.state({ state: 'RUNNING', siphonStopAllowed: true, siphon: { ...live, hoons: true } })
+  const red = doc.body.children[0]
+  assert.match(red.style.cssText, /#eb5757/, 'red border with Hoons near'); assert.match(text(red), /Hoons nearby/)
+  const stop = red.children.find(c => c.textContent === 'Stop')
+  stop.onclick()
+  assert.equal(a.commands.at(-1), fixed('siphonStop()'))
+  a.state({ state: 'RUNNING', siphon: { active: false, litres: 12, result: 'Siphon stopped. You took 12 L.' } })
+  assert.match(text(doc.body.children[0]), /You took 12 L/)
+  assert.ok(!doc.body.children[0].children.some(c => c.textContent === 'Stop'), 'no Stop once done')
+  a.state({ state: 'RUNNING' })
+  assert.equal(doc.body.children.length, 0, 'the box goes')
+  a.state({ state: 'RUNNING', siphon: live })
+  a.handlers.$destroy()
+  assert.equal(doc.body.children.length, 0, 'the box goes with the app')
 })
 
 test('strip helpers show fuel, ammo and the threat light', () => {

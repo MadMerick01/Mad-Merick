@@ -42,7 +42,22 @@ function F.fuel()
   local f = { reads = 0, sets = {} }
   function f:read() self.reads = self.reads + 1; return true end
   function f:set(litres, serial) self.sets[#self.sets + 1] = { litres = litres, serial = serial }; return true end
+  f.changes = {}
+  function f:change(litres, serial, id) self.changes[#self.changes + 1] = { litres = litres, serial = serial, id = id }; return true end
   return f
+end
+
+-- Cars near the player: the test says which car is how far, and how fast the player goes.
+function F.nearby(cars, speed)
+  local n = { cars = cars or {}, speed = speed or 0 }
+  function n:closest(id)
+    local best
+    for carId, metres in pairs(self.cars) do
+      if (id == nil or carId == id) and (not best or metres < best.metres) then best = { id = carId, metres = metres } end
+    end
+    return best, { id = 7, speed = self.speed }
+  end
+  return n
 end
 
 function F.pistol(state)

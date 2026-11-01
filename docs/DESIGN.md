@@ -105,7 +105,7 @@ The chase code is not in Earth Freight. It is the CarKov hostiles in Earth Endur
 
 Other tankers drive the highway, alone or in convoys with escorts. When they see you coming they run, using BeamNG's AI in flee mode. You stop them by shooting out their tyres or forcing them off the road.
 
-A downed tanker is the big prize: a lot of fuel, but it takes time to siphon, and the escorts arrive while you do. A siphon moves **1 litre a second** to start (Rowan, 31 Oct), so a few hundred litres means minutes standing still. **❓ OPEN — Q6:** whether you can drive away mid-siphon with what you have so far.
+A downed tanker is the big prize: a lot of fuel, but it takes time to siphon, and the escorts arrive while you do. A siphon moves **1 litre a second** to start (Rowan, 31 Oct), so a few hundred litres means minutes standing still. You can drive away mid-siphon and keep what you have so far; driving off simply stops it. The first siphon works on any car within 10 m, so it can be tried before tankers exist.
 
 ## Spawning from traffic
 
@@ -224,5 +224,4 @@ Answered on 31 Oct: the ending (open ended, with orders after Pine Gap), game ov
 - **Q1:** What the orders at Pine Gap are, and how the player leaves Australia.
 - **Q2:** The route and its legs.
 - **Q5:** Which vanilla configs are rat rods, and which later Hoon type comes first: exploding, fire or spiked?
-- **Q6:** Can you drive off mid-siphon with what you have so far?
 - **Q9:** What the wrist HUD shows when raised to your face.

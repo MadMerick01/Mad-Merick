@@ -1,6 +1,7 @@
 -- Fuel. BeamNG already burns fuel as you drive (more with a heavy load); this reads the player
 -- truck's tank and sets it, to put the tank back as it was saved when a session starts. Copied from
--- Earth Freight. The truck answers through tanker_core.fuelReading and tanker_core.fuelSet.
+-- Earth Freight. It also adds or takes litres from any car's tank, for siphoning. The cars answer
+-- through tanker_core.fuelReading, tanker_core.fuelSet and tanker_core.fuelChanged.
 -- Every game call is guarded: a missing or changed one means no reading.
 local M = {}
 
@@ -12,7 +13,10 @@ M.STALE_SECONDS = 10
 M.FULL_MARGIN_LITRES = 0.5
 
 local function defaults()
-  return { player = function() return getPlayerVehicle(0) end }
+  return {
+    player = function() return getPlayerVehicle(0) end,
+    byId = function(id) return be and be:getObjectByID(id) end,
+  }
 end
 
 -- Runs inside the car: adds up its fuel tanks (energy storages with a volume and capacity in
@@ -46,6 +50,20 @@ local after = 0
 for _, s in ipairs(tanks) do after = after + (s.remainingVolume or 0) end
 obj:queueGameEngineLua(string.format('if tanker_core then tanker_core.fuelSet(%%d, %%d, %%.3f, %%.3f, %%.3f) end', %d, %d, before, after, capacity))
 ]]
+-- Adds litres to the tanks (or takes them, when negative), never past empty or full, and reports
+-- what was there before and after, so the caller knows how much really moved. The outer
+-- string.format fills in the change, the car's id and the serial.
+local CHANGE = TANKS .. [[
+local before = litres
+local target = math.max(0, math.min(capacity, litres + %.3f))
+for _, s in ipairs(tanks) do
+  local ratio = capacity > 0 and target / capacity or 0
+  if s.setRemainingRatio then s:setRemainingRatio(ratio) elseif s.setRemainingVolume then s:setRemainingVolume(ratio * s.capacity) end
+end
+local after = 0
+for _, s in ipairs(tanks) do after = after + (s.remainingVolume or 0) end
+obj:queueGameEngineLua(string.format('if tanker_core then tanker_core.fuelChanged(%%d, %%d, %%.3f, %%.3f, %%.3f) end', %d, %d, before, after, capacity))
+]]
 
 -- How far this many litres goes, in km, at the rate measured so far (litres used over km driven).
 -- nil until at least MIN_RANGE_KM has been driven with fuel going down, so a first guess is not shown.
@@ -61,8 +79,9 @@ function M.new(environment)
   local env = environment or defaults()
   local f = {}
 
-  local function send(command)
-    local okVehicle, vehicle = pcall(env.player)
+  local function send(command, id)
+    local okVehicle, vehicle
+    if id ~= nil then okVehicle, vehicle = pcall(env.byId, id) else okVehicle, vehicle = pcall(env.player) end
     if not okVehicle or not vehicle then return false, 'vehicle_required' end
     local idOK, id = pcall(function() return vehicle:getID() end)
     if not idOK or type(id) ~= 'number' then return false, 'vehicle_required' end
@@ -81,6 +100,15 @@ function M.new(environment)
   function f:set(litres, serial)
     if type(litres) ~= 'number' or litres ~= litres or litres < 0 then return false, 'invalid_litres' end
     return send(function(id) return string.format(SET, litres, id, serial or 0) end)
+  end
+
+  -- Adds this many litres to a car's tank, or takes them when negative: the player's car, or the
+  -- car with this id. serial ties the answer, which comes back through fuelChanged, to this request.
+  function f:change(litres, serial, id)
+    if type(litres) ~= 'number' or litres ~= litres or litres == math.huge or litres == -math.huge then
+      return false, 'invalid_litres'
+    end
+    return send(function(carId) return string.format(CHANGE, litres, carId, serial or 0) end, id)
   end
 
   return f
