@@ -3,16 +3,16 @@ local location = require('tanker/location')
 local M = {}
 
 -- One-line settings. Tune these after testing in game.
--- Port Wakefield, SA: on Highway 1 at the top of Gulf St Vincent, where the farms north of
--- Adelaide give way to salt flats. A first pick for "the edge of the desert"; config.json's start
+-- Yorkeys Crossing, outside Port Augusta, SA: Rowan's pick for where the run starts, at the head
+-- of Spencer Gulf where the Stuart Highway heads north into the desert. config.json's start
 -- moves it.
-M.START = { latitude = -34.1906, longitude = 138.1428 }
-M.START_NAME = 'Port Wakefield'
+M.START = { latitude = -32.47125, longitude = 137.78370 }
+M.START_NAME = 'Yorkeys Crossing, Port Augusta'
 -- Pine Gap, outside Alice Springs. Everything about it in the game is fiction.
 M.GOAL = { latitude = -23.7990, longitude = 133.7370 }
 M.GOAL_NAME = 'Pine Gap'
--- Roads are longer than the straight line. 1.18 puts Port Wakefield to Pine Gap at about 1,450 km,
--- close to the real drive up Highway 1 and the Stuart Highway.
+-- Roads are longer than the straight line. 1.18 puts Yorkeys Crossing to Pine Gap at about 1,230 km,
+-- close to the real drive up the Stuart Highway.
 M.ROAD_FACTOR = 1.18
 -- A new run starts once the truck is this close to the start, after the teleport there.
 M.START_RADIUS_METRES = 5000

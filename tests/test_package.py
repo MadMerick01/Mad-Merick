@@ -40,6 +40,20 @@ class PackageTest(unittest.TestCase):
             self.assertIn('start', config)
             self.assertTrue(archive.read(prefix + 'app.png').startswith(b'\x89PNG'))
 
+    def test_starter_truck_is_packaged(self):
+        prefix = 'vehicles/pickup/'
+        with ZipFile(self.output) as archive:
+            config = json.loads(archive.read(prefix + 'tankerstarter.pc'))
+            info = json.loads(archive.read(prefix + 'info_tankerstarter.json'))
+            thumbnail = archive.read(prefix + 'tankerstarter.jpg')
+            module = archive.read('lua/ge/extensions/tanker/vehicle.lua')
+        self.assertEqual(config['model'], 'pickup')
+        self.assertEqual(config['parts']['pickup_bedextra_long'], 'pickup_bed_cargo_load_box_XL')
+        self.assertEqual(config['parts']['cargo_load_box_XL_A_90deg'], 'cargo_load_tank_XL_A_90deg')
+        self.assertEqual(info['Configuration'], config['Configuration'])
+        self.assertTrue(thumbnail.startswith(b'\xff\xd8'))
+        self.assertIn(b"'vehicles/pickup/tankerstarter.pc'", module)
+
     def test_build_is_deterministic(self):
         again = build(Path(self.temp.name) / 'again.zip')
         self.assertEqual(self.output.read_bytes(), again.read_bytes())

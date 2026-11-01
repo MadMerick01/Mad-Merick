@@ -52,6 +52,14 @@ function F.pistol(state)
   return p
 end
 
+-- The game's vehicles: records starter truck requests; the test says when the truck arrives.
+function F.vehicles(refuse)
+  local v = { spawns = 0, playerId = 7 }
+  function v:spawnStarter() if refuse then return false, refuse end self.spawns = self.spawns + 1; return true end
+  function v:isPlayer(id) return id == self.playerId end
+  return v
+end
+
 -- A controller with fakes, and what it sent to the HUD.
 function F.controller(adapter, extra)
   local core = require('tanker/core')
