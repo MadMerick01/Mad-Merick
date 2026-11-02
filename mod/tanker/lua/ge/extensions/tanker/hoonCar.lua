@@ -8,6 +8,8 @@ local M = {}
 M.MODELS = { 'hotrod', 'burnside', 'moonhawk' }
 -- How high above the player the car waits while hidden, in metres.
 M.HIDE_LIFT = 2000
+-- A road point counts as solid when the ground under it is within this many metres of it.
+M.SOLID_METRES = 3
 
 local function defaults()
   return {
@@ -18,6 +20,17 @@ local function defaults()
     spawn = function() return rawget(_G, 'spawn') end,
     vec3 = function(x, y, z) return vec3(x, y, z) end,
     quatFromDir = function(dir, up) return quatFromDir(dir, up) end,
+    -- The height of whatever is solid under x, y, from a few metres above z.
+    ground = function(x, y, z)
+      if be and be.getSurfaceHeightBelow then
+        local h = be:getSurfaceHeightBelow(vec3(x, y, z + 5))
+        if type(h) == 'number' and h > -1e6 then return h end
+      end
+      if type(castRayStatic) == 'function' then
+        local d = castRayStatic(vec3(x, y, z + 5), vec3(0, 0, -1), 50)
+        if type(d) == 'number' and d < 50 then return z + 5 - d end
+      end
+    end,
   }
 end
 
@@ -110,7 +123,7 @@ function M.new(environment)
     return (pcall(function() c:setActive(0) end))
   end
 
-  -- How far the nearest road is from x, y, z, and a point on it.
+  -- The nearest road to x, y, z: the closest point on it and how far that is.
   function h:road(x, y, z)
     local okMap, map = pcall(env.map)
     if not okMap or type(map) ~= 'table' or type(map.findClosestRoad) ~= 'function' or type(map.getMap) ~= 'function' then
@@ -122,16 +135,24 @@ function M.new(environment)
     if not ok or not a then return nil end
     local okNodes, nodes = pcall(function() return map.getMap().nodes end)
     if not okNodes or type(nodes) ~= 'table' then return nil end
-    local best
-    for _, name in ipairs({ a, b }) do
-      local node = nodes[name]
-      local nx, ny, nz = xyz(node and node.pos)
-      if nx then
-        local d = math.sqrt((nx - x) ^ 2 + (ny - y) ^ 2 + (nz - z) ^ 2)
-        if not best or d < best.metres then best = { x = nx, y = ny, z = nz, metres = d } end
-      end
-    end
-    return best
+    local ax, ay, az = xyz(nodes[a] and nodes[a].pos)
+    local bx, by, bz = xyz(b and nodes[b] and nodes[b].pos)
+    if not ax then return nil end
+    if not bx then bx, by, bz = ax, ay, az end
+    -- The closest point on the stretch of road between the two nodes.
+    local sx, sy, sz = bx - ax, by - ay, bz - az
+    local len2 = sx * sx + sy * sy + sz * sz
+    local t = len2 > 1e-9 and math.max(0, math.min(1, ((x - ax) * sx + (y - ay) * sy + (z - az) * sz) / len2)) or 0
+    local px, py, pz = ax + sx * t, ay + sy * t, az + sz * t
+    return { x = px, y = py, z = pz, metres = math.sqrt((px - x) ^ 2 + (py - y) ^ 2 + (pz - z) ^ 2) }
+  end
+
+  -- Whether there is solid ground at x, y, z: BeamNG.Earth streams its terrain in, so a road far
+  -- from the player may not be there yet. The ground must be within SOLID_METRES of the road.
+  function h:solid(x, y, z)
+    local okBe, ground = pcall(env.ground, x, y, z)
+    if not okBe or not finite(ground) then return false end
+    return math.abs(ground - z) <= M.SOLID_METRES
   end
 
   -- Puts the Hoon on the road at x, y, z facing the player, switches it on and sets it hunting.

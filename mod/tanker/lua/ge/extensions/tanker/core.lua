@@ -198,8 +198,8 @@ function M.new(env)
   function c:sendHoon()
     if self.state ~= 'RUNNING' or not self.hoons or self.hoons.state ~= 'HIDDEN' then return false end
     local line, why = self.hoons:send(self.clock)
-    self.feedback = line or (why == 'off_road' and 'Hoons only come when you are near a road.'
-      or why == 'no_road_behind' and 'No road behind you for a Hoon to come down. Try further along.'
+    self.feedback = line or (why == 'off_road' and 'Hoons only come when you are on a road.'
+      or why == 'no_solid_road' and 'No solid road near you for a Hoon yet. Try further along.'
       or 'The Hoon could not be sent: ' .. tostring(why))
     return line ~= nil
   end

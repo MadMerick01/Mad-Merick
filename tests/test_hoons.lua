@@ -13,6 +13,7 @@ local function fakeCar()
     if not self.roads then return nil end
     return { x = x, y = y, z = z, metres = self.offRoad or 0 }
   end
+  function car:solid(x, y) return not (self.holeBehind and y < self.me.y) end
   function car:attack(id, x, y, z, target)
     self.attacks[#self.attacks + 1] = { id = id, x = x, y = y, target = target }
     self.hoon = { x = x, y = y, z = z, speed = 0 }
@@ -36,7 +37,7 @@ T.eq(h:load(10), nil, 'loads the car'); T.eq(h.state, 'HIDDEN', 'and hides it')
 T.eq(h:load(10), nil, 'only once'); T.eq(car.loads, 1, 'one car')
 T.eq(h:step(0, 12), nil, 'no Hoon before the first km')
 T.eq(h:step(0, 13), H.LINES.coming, 'a Hoon comes after the first km')
-T.eq(car.attacks[1].y, -H.BEHIND_METRES, 'put on the road behind you'); T.eq(car.attacks[1].target, 7, 'hunting you')
+T.eq(car.attacks[1].y, -H.PLACE_METRES, 'put on the road 250 m behind you'); T.eq(car.attacks[1].target, 7, 'hunting you')
 T.eq(h:hunting(), true, 'hunting')
 car.hoon.speed = 25; car.hoon.y = -100
 h:step(1, 13)
@@ -57,6 +58,14 @@ T.eq(h:step(40, 20), H.LINES.coming, 'the next Hoon')
 car.hoon.speed = 30; car.hoon.y = car.me.y - 2000
 T.eq(steps(h, 41, H.ESCAPE_SECONDS, 20), H.LINES.escaped, 'outrun it and it gives up')
 T.eq(h.state, 'HIDDEN', 'back in hiding')
+
+-- No solid road behind: it comes from ahead instead.
+car.holeBehind = true
+h:putAway(20)
+T.eq(h:step(60, 40), H.LINES.ahead, 'comes from ahead when the road behind is not solid')
+T.eq(car.attacks[#car.attacks].y, car.me.y + H.PLACE_METRES, 'put on the road ahead')
+car.holeBehind = nil
+h:putAway(20)
 
 -- No Hoon while stopped, off road, or with no road behind; it tries again later.
 car.me.speed = 0
@@ -117,6 +126,7 @@ local player = gameCar(7, v3(0, 0, 10))
 local game = HC.new({
   player = function() return player end, byId = function(id) return cars[id] end, vec3 = v3,
   quatFromDir = function() return { 0, 0, 0, 1 } end, spawn = function() return nil end,
+  ground = function(x, y, z) if y < -395 then return z + 1 end end,
   vehicles = function() return {
     getModel = function(name) return name == 'burnside' and { model = 'burnside' } or {} end,
     spawnNewVehicle = function(model, opts) spawned[#spawned + 1] = { model = model, opts = opts }; return gameCar(50, opts.pos) end,
@@ -130,10 +140,11 @@ local id, model = game:load()
 T.eq(id, 50, 'the Hoon car is loaded'); T.eq(model, 'burnside', 'the first model the game has')
 T.eq(spawned[1].opts.autoEnterVehicle, false, 'without moving you into it')
 T.eq(cars[50].active, 0, 'and switched off at once')
-local road = game:road(0, -400, 10)
-T.eq(road.y, -400, 'the nearest road point'); T.near(road.metres, 5, 1e-9, 'and how far')
+local road = game:road(3, -390, 5)
+T.near(road.y, -390, 1e-9, 'the nearest point on the road'); T.near(road.metres, 3, 1e-9, 'and how far')
+T.eq(game:solid(0, -390, 5), false, 'no ground, not solid'); T.eq(game:solid(0, -400, 5), true, 'ground under the road is solid')
 T.eq(game:attack(50, road.x, road.y, road.z, 7), true, 'attacks')
-T.eq(cars[50].active, 1, 'switched on'); T.eq(cars[50].pos.y, -400, 'put on the road')
+T.eq(cars[50].active, 1, 'switched on'); T.near(cars[50].pos.y, -390, 1e-9, 'put on the road')
 T.check(cars[50].commands[#cars[50].commands]:find("setTargetObjectID, 7", 1, true), 'hunting you')
 T.check((loadstring or load)(cars[50].commands[#cars[50].commands]) ~= nil, 'the AI command is valid Lua')
 T.eq(game:state(50).speed, 0, 'reads the Hoon')

@@ -10,12 +10,15 @@ local M = {}
 M.FIRST_KM = 3
 -- Then one comes every this many km of driving, picked at random between the two.
 M.GAP_MIN_KM, M.GAP_MAX_KM = 6, 14
--- Hoons only come while you are driving within this many metres of a road.
-M.ROAD_METRES = 150
--- Where the Hoon is put: this far behind you, on the road nearest there.
-M.BEHIND_METRES = 400
--- Never closer than this to you when it appears.
-M.MIN_START_METRES = 200
+-- Hoons only come while you are driving within this many metres of a road: never off road.
+M.ROAD_METRES = 30
+-- Where the Hoon is put: this far behind you on the road, or ahead if there is no solid road
+-- behind. Close, because BeamNG.Earth's road further away may not have loaded.
+M.PLACE_METRES = 250
+-- The road point must be within this many metres of that spot, and the Hoon never closer than
+-- MIN_START_METRES to you.
+M.SNAP_METRES = 80
+M.MIN_START_METRES = 150
 -- You must be going at least this fast, in metres a second, for a Hoon to come.
 M.DRIVING_MPS = 3
 -- A Hoon going slower than this for DOWN_SECONDS is down.
@@ -31,6 +34,7 @@ M.RETRY_SECONDS = 10
 
 local LINES = {
   coming = 'A Hoon is coming up behind you.',
+  ahead = 'A Hoon is coming at you from up the road.',
   down = 'The Hoon is down. Siphon its tank before more come.',
   escaped = 'You lost the Hoon.',
   tired = 'The Hoon gave up.',
@@ -72,12 +76,21 @@ function M.new(car, random)
     if not me then return nil, 'no_player' end
     local near = car:road(me.x, me.y, me.z)
     if not near or near.metres > M.ROAD_METRES then return nil, 'off_road' end
-    local road = car:road(me.x - me.dx * M.BEHIND_METRES, me.y - me.dy * M.BEHIND_METRES, me.z)
-    if not road or distance(road, me) < M.MIN_START_METRES then return nil, 'no_road_behind' end
+    -- Behind first, then ahead: a road point near the spot, far enough away, with solid ground.
+    local road, line
+    for _, side in ipairs({ { -1, LINES.coming }, { 1, LINES.ahead } }) do
+      local x, y = me.x + side[1] * me.dx * M.PLACE_METRES, me.y + side[1] * me.dy * M.PLACE_METRES
+      local r = car:road(x, y, me.z)
+      if r and r.metres <= M.SNAP_METRES and distance(r, me) >= M.MIN_START_METRES and car:solid(r.x, r.y, r.z) then
+        road, line = r, side[2]
+        break
+      end
+    end
+    if not road then return nil, 'no_solid_road' end
     local ok, why = car:attack(self.id, road.x, road.y, road.z, me.id)
     if not ok then return nil, why end
     self.state, self.since, self.far, self.slow = 'HUNTING', clock, nil, nil
-    return LINES.coming
+    return line
   end
 
   -- Puts the Hoon away and picks when the next one comes.
