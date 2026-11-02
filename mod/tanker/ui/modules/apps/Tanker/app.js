@@ -2,7 +2,7 @@
 angular.module('beamng.apps').directive('tankerHud', [function () {
   // What the player was looking at. BeamNG rebuilds the app each time a menu closes, so this is
   // kept out here and the new app carries on where the old one was.
-  var kept = { tab: 'road', open: true }
+  var kept = { tab: 'road', open: true, start: false, startShown: false }
   // The commands the HUD may send, each only while Lua says it is allowed.
   var COMMANDS = { startRun: 'startAllowed', goToSave: 'goToSaveAllowed', save: 'saveAllowed', rocksOn: 'rocksAllowed', rocksOff: 'rocksAllowed',
     siphonStart: 'siphonAllowed', siphonStop: 'siphonStopAllowed' }
@@ -91,6 +91,17 @@ angular.module('beamng.apps').directive('tankerHud', [function () {
       scope.open = kept.open
       scope.setTab = function (id) { scope.tab = kept.tab = id }
       scope.toggle = function () { scope.open = kept.open = !scope.open }
+      // The start page: opens by itself once each time the game loads with a run to start or a
+      // save to go back to, and from the Start page button.
+      scope.start = kept.start
+      scope.openStart = function () { scope.start = kept.start = true; scope.open = kept.open = true }
+      scope.closeStart = function () { scope.start = kept.start = false }
+      scope.startCommand = function (name) { scope.send(name); scope.closeStart() }
+      scope.km = function (metres) { return typeof metres === 'number' && isFinite(metres) ? whole(metres / 1000) : '–' }
+      scope.coordinates = function (s) {
+        if (!s || typeof s.latitude !== 'number' || typeof s.longitude !== 'number') return ''
+        return Math.abs(s.latitude).toFixed(5) + (s.latitude < 0 ? ' S, ' : ' N, ') + Math.abs(s.longitude).toFixed(5) + (s.longitude < 0 ? ' W' : ' E')
+      }
       scope.send = function (name) {
         var allowed = COMMANDS[name]
         if (allowed && scope.data[allowed] === true) core(name + '()')
@@ -117,7 +128,14 @@ angular.module('beamng.apps').directive('tankerHud', [function () {
       scope.$on('TankerState', function (event, data) {
         if (disposed || !data || typeof data.state !== 'string') return
         lastMessage = Date.now()
-        scope.$evalAsync(function () { if (!disposed) scope.data = data })
+        scope.$evalAsync(function () {
+          if (disposed) return
+          scope.data = data
+          if (!kept.startShown && (data.state === 'NEW' || data.state === 'AWAY')) {
+            kept.startShown = true
+            scope.openStart()
+          }
+        })
         showBox(data.siphon, function () { scope.send('siphonStop') })
       })
       mount(true)

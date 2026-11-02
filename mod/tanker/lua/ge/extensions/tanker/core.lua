@@ -328,7 +328,16 @@ function M.new(env)
       v.goal = route.toGoal(here)
       v.progress = route.progress(here, self:start())
     end
-    if self.profile then v.drivenKm = self.profile.run.drivenKm end
+    if self.profile then
+      v.drivenKm = self.profile.run.drivenKm
+      -- For the start page's Welcome back box: where the save is and what it holds.
+      local resume = self.profile.resume
+      local toGoal = resume and route.toGoal(resume)
+      v.save = { latitude = resume and resume.latitude, longitude = resume and resume.longitude,
+        roadKm = toGoal and toGoal.roadKm, fuelLitres = self.profile.vehicle.fuelLitres,
+        drivenKm = self.profile.run.drivenKm,
+        metresAway = here.valid and resume and location.distance(here, resume) or nil }
+    end
     v.siphonAllowed = self:siphonBlocked() == nil
     v.siphonStopAllowed = self.siphon:active()
     if self.near and self.near.metres <= siphon.REACH_METRES and self.state == 'RUNNING' then
