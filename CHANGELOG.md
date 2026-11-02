@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+- **Tanker now has a start page.** It opens by itself when you load the game, and the **Start page** button at the top of the panel brings it back at any time. It tells the story of the 2027 fuel wars, lists the rules (one run, one save, no restarts, no shops) and has the **Start the run** button for a new run. With a saved run, a **Welcome back** box shows how far your save is from Pine Gap, the fuel you saved, the km you've driven and where the save is, with **Go to your save**. It also warns you if the VR revolver mod isn't installed. Your save still works.
+
 ## Build 5 · 1 Nov 2026
 
 - **You can now siphon fuel from other cars.** Stop within about 10 m of any car, parked, crashed or in traffic, and the **Road** tab shows a **Siphon fuel** button with how far away the car is. Press it and fuel moves from their tank into yours at 1 litre a second. A bold **Siphoning** box near the top of the screen shows the litres taken so far, their tank emptying and yours filling. Its border turns red and it says "Hoons nearby!" when Hoons are close. It stops by itself when their tank is dry, your tank is full or you drive off, and you keep everything you took. Press **Stop** in the box, or **Stop siphoning** on the Road tab, to stop it yourself. In VR, a small pip on your wrist blinks green while fuel flows. Your save still works.

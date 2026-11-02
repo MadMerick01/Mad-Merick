@@ -110,6 +110,25 @@ test('siphon buttons and the siphon box', () => {
   assert.equal(doc.body.children.length, 0, 'the box goes with the app')
 })
 
+test('the start page opens once by itself, and its buttons close it', () => {
+  const a = app()
+  assert.equal(a.scope.start, false)
+  a.state({ state: 'NEW', startAllowed: true })
+  assert.equal(a.scope.start, true, 'opens for a new run'); assert.equal(a.scope.open, true, 'with the panel open')
+  a.scope.startCommand('startRun')
+  assert.equal(a.commands.at(-1), fixed('startRun()')); assert.equal(a.scope.start, false, 'closes on Start the run')
+  a.state({ state: 'AWAY', goToSaveAllowed: true })
+  assert.equal(a.scope.start, false, 'only opens by itself once')
+  a.scope.openStart()
+  a.remount()
+  assert.equal(a.scope.start, true, 'kept open across rebuilds')
+  a.scope.closeStart()
+  assert.equal(a.scope.start, false)
+  assert.equal(a.scope.coordinates({ latitude: -32.47125, longitude: 137.7837 }), '32.47125 S, 137.78370 E')
+  assert.equal(a.scope.coordinates(null), '')
+  assert.equal(a.scope.km(12345), '12')
+})
+
 test('strip helpers show fuel, ammo and the threat light', () => {
   const a = app()
   assert.equal(a.scope.whole(1453.6), '1,454')
@@ -136,7 +155,8 @@ test('ignores malformed state and keeps the tab across rebuilds', () => {
 })
 
 test('template uses only the helpers the app defines', () => {
-  for (const name of ['toggle', 'send', 'whole', 'fuelShare', 'fuelColour', 'pips', 'threatColour', 'setTab']) {
+  for (const name of ['toggle', 'send', 'whole', 'fuelShare', 'fuelColour', 'pips', 'threatColour', 'setTab',
+    'openStart', 'closeStart', 'startCommand', 'coordinates', 'km']) {
     assert.ok(html.includes(name + '('), name)
   }
   assert.ok(!/bngApi|engineLua/.test(html), 'no direct Lua from the template')
