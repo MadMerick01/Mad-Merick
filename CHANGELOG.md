@@ -6,6 +6,8 @@ Every change to Tanker, in plain English, newest first. Each build is a new down
 
 Changes that are finished but not in a download yet. They move into a numbered build as soon as it's published.
 
+## Build 6 · 2 Nov 2026
+
 - **Tanker now has a start page.** It opens by itself when you load the game, and the **Start page** button at the top of the panel brings it back at any time. It tells the story of the 2027 fuel wars, lists the rules (one run, one save, no restarts, no shops) and has the **Start the run** button for a new run. With a saved run, a **Welcome back** box shows how far your save is from Pine Gap, the fuel you saved, the km you've driven and where the save is, with **Go to your save**. It also warns you if the VR revolver mod isn't installed. Your save still works.
 
 ## Build 5 · 1 Nov 2026
